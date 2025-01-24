@@ -114,8 +114,8 @@ function addActionsForHtmlUI () {
         sunsetButton.textContent = "I will never listen to you!";
         alert("You lived an entire day without sleeping. That is not healthy please go to sleep.");
       }
-      else if (sunsetButton.textContent == "I will never listen to you!") {
-        alert("That is enough. You are grounded! I will remove the button so you have no choice but to sleep.")
+      else if (sunsetButton.textContent == "I will never sleep!") {
+        alert("I will remove the button so you have no choice but to sleep.")
         sunsetButton.remove();
       }
       else {

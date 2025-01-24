@@ -92,41 +92,48 @@ function addActionsForHtmlUI () {
     // Size Slider elements
     document.getElementById('sizeSlide').addEventListener('mouseup', function(){ g_selected_size = this.value });
 
-    // A button to toggle a sunset made using CSS by the file sunset.css --> This is my submission for part 13
+
+    // Drawing I made for part 12 --> Drawing button 
+    document.getElementById("drawingButton").onclick = function () {
+      g_shapesList = [];
+      for (let i = 0; i < 200; i++) {
+        let triangle = new Circle();
+        triangle.position = [Math.random() * 2 - 1, Math.random() * 2 - 1]; // Random position in the range [-1, 1]
+        triangle.size = Math.random() * 1; // Random size between 5 and 15
+        triangle.color = [1.0, 1.0, 1.0, 1.0]; // White color
+        g_shapesList.push(triangle);
+      }
+      renderAllShapes();
+    }
+    
+
+    // A day-night cycle button made using CSS by the file sunset.css --> This is my submission for part 13
     let sunsetButton = document.getElementById('toggleSunsetButton');
-      // Define theme names in the order of transition
-      const themes = ['afternoon', 'sunset', 'nightfall', 'sunrise'];
-      let currentThemeIndex = 0; // Track the current theme index
-      sunsetButton.onclick = function () {
-      // Get the current and next themes
-      const currentTheme = themes[currentThemeIndex];
-      const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
-      const nextTheme = themes[nextThemeIndex];
-      // Remove the current theme class
-      document.body.classList.remove(currentTheme);
-      // If we are transitioning from sunrise to afternoon, use the special transition class from sunset.css to complete the day
-      if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
-        document.body.classList.add('afternoon-transition');
-        sunsetButton.textContent = "I don't want to sleep anymore!"
-      } 
-      // If one day is already completed, send an alert and remove the button so the user can get some sleep
-      else if (sunsetButton.textContent == "I don't want to sleep anymore!") {
-        sunsetButton.textContent = "I will never listen to you!";
-        alert("You lived an entire day without sleeping. That is not healthy please go to sleep.");
-      }
-      else if (sunsetButton.textContent == "I will never sleep!") {
-        alert("I will remove the button so you have no choice but to sleep.")
-        sunsetButton.remove();
-      }
-      else {
-        document.body.classList.add(nextTheme);
-        // Update the button text
-        sunsetButton.textContent = `Switch to ${themes[(nextThemeIndex + 1) % themes.length]}`;
-      }
-  
-      // Update the theme index
-      currentThemeIndex = nextThemeIndex;
-      };    
+    const themes = ['afternoon', 'sunset', 'nightfall', 'sunrise'];
+    let currentThemeIndex = 0; 
+    sunsetButton.onclick = function () {
+        const currentTheme = themes[currentThemeIndex];
+        const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+        const nextTheme = themes[nextThemeIndex];
+        document.body.classList.remove(currentTheme);
+        if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
+          document.body.classList.add('afternoon-transition');
+          sunsetButton.textContent = "I don't want to sleep anymore!"
+        } 
+        else if (sunsetButton.textContent == "I don't want to sleep anymore!") {
+          sunsetButton.textContent = "I will never listen to you!";
+          alert("You lived an entire day without sleeping. That is not healthy please go to sleep.");
+        }
+        else if (sunsetButton.textContent == "I will never sleep!") {
+          alert("I will remove the button so you have no choice but to sleep.")
+          sunsetButton.remove();
+        }
+        else {
+          document.body.classList.add(nextTheme);
+          sunsetButton.textContent = `Switch to ${themes[(nextThemeIndex + 1) % themes.length]}`;
+        }
+        currentThemeIndex = nextThemeIndex;
+    };    
 }
 
 function main() {

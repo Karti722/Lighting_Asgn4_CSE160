@@ -108,6 +108,7 @@ function addActionsForHtmlUI () {
       if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
         document.body.classList.add('afternoon-transition');
       } else {
+        document.body.classList.remove('afternoon-transition');
         document.body.classList.add(nextTheme);
       }
       // Update the button text

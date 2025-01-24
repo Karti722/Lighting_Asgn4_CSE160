@@ -118,14 +118,10 @@ function addActionsForHtmlUI () {
         document.body.classList.remove(currentTheme);
         if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
           document.body.classList.add('afternoon-transition');
-          sunsetButton.textContent = "I don't want to sleep anymore!"
+          sunsetButton.textContent = "I don't want to sleep"
         } 
-        else if (sunsetButton.textContent == "I don't want to sleep anymore!") {
-          sunsetButton.textContent = "I will never listen to you!";
-          alert("You lived an entire day without sleeping. That is not healthy please go to sleep.");
-        }
-        else if (sunsetButton.textContent == "I will never sleep!") {
-          alert("I will remove the button so you have no choice but to sleep.")
+        else if (sunsetButton.textContent == "I don't want to sleep") {
+          alert("That is not healthy please go to sleep. I will remove the button now.");
           sunsetButton.remove();
         }
         else {

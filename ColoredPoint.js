@@ -91,6 +91,30 @@ function addActionsForHtmlUI () {
 
     // Size Slider elements
     document.getElementById('sizeSlide').addEventListener('mouseup', function(){ g_selected_size = this.value });
+
+    // A button to toggle a sunset made using CSS by the file sunset.css --> This is my submission for part 13
+    let sunsetButton = document.getElementById('toggleSunsetButton');
+      // Define theme names in the order of transition
+      const themes = ['afternoon', 'sunset', 'nightfall', 'sunrise'];
+      let currentThemeIndex = 0; // Track the current theme index
+      sunsetButton.onclick = function () {
+      // Get the current and next themes
+      const currentTheme = themes[currentThemeIndex];
+      const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+      const nextTheme = themes[nextThemeIndex];
+      // Remove the current theme class
+      document.body.classList.remove(currentTheme);
+      // If we are transitioning from sunrise to afternoon, use the special transition class from sunset.css
+      if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
+        document.body.classList.add('afternoon-transition');
+      } else {
+        document.body.classList.add(nextTheme);
+      }
+      // Update the button text
+      sunsetButton.textContent = `Switch to ${themes[(nextThemeIndex + 1) % themes.length]}`;
+      // Update the theme index
+      currentThemeIndex = nextThemeIndex;
+      };    
 }
 
 function main() {
@@ -113,12 +137,7 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
-
-
 var g_shapesList = [];
-// var g_points = [];  // The array for the position of a mouse press
-// var g_colors = [];  // The array to store the color of a point
-// var g_sizes = [];   // The array to store the sizes of a point
 
 function click(ev) {
 

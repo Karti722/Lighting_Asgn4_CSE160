@@ -1,0 +1,133 @@
+/* sunset.css */
+
+body {
+  background-color: #87CEEB; /* Afternoon (sky blue) */
+  color: #000; /* Black text for afternoon */
+  margin: 0;
+  transition: background-color 10.5s linear, color 10.5s linear;
+}
+
+/* Afternoon Theme */
+body.afternoon {
+  background-color: #87CEEB; /* Sky blue */
+  color: #000000; /* Black text */
+}
+
+/* Sunset Transition */
+body.sunset {
+  animation: sunsetTransition 10.5s forwards;
+}
+
+@keyframes sunsetTransition {
+  0% {
+    background-color: #87CEEB; /* Afternoon sky blue */
+    color: #000000; /* Black text */
+  }
+  50% {
+    background-color: #FF8C00; /* Warm orange glow */
+    color: #FFF8DC; /* Cornsilk text */
+  }
+  100% {
+    background-color: #FF4500; /* Sunset orange-red */
+    color: #FFF8DC; /* Cornsilk text */
+  }
+}
+
+/* Nightfall Transition */
+body.nightfall {
+  animation: nightfallTransition 10.5s forwards;
+}
+
+@keyframes nightfallTransition {
+  0% {
+    background-color: #FF4500; /* Sunset orange-red */
+    color: #FFF8DC; /* Cornsilk text */
+  }
+  50% {
+    background-color: #3B3B98; /* Twilight blue-purple */
+    color: #B0C4DE; /* Light steel blue text */
+  }
+  100% {
+    background-color: #001233; /* Deep night blue */
+    color: #FFFFFF; /* White text */
+  }
+}
+
+/* Sunrise Transition */
+body.sunrise {
+  animation: sunriseTransition 10.5s forwards;
+}
+
+@keyframes sunriseTransition {
+  0% {
+    background-color: #001233; /* Deep night blue */
+    color: #FFFFFF; /* White text */
+  }
+  50% {
+    background-color: #FF99AC; /* Pink glow */
+    color: #FFDAB9; /* Peach puff text */
+  }
+  100% {
+    background-color: #FFE4B5; /* Morning light (moccasin) */
+    color: #000000; /* Black text */
+  }
+}
+
+/* Sunrise to Afternoon Transition */
+body.afternoon-transition {
+  animation: sunriseToAfternoonTransition 20.5s forwards;
+}
+
+@keyframes sunriseToAfternoonTransition {
+  0% {
+    background-color: #FFE4B5; /* Morning light (moccasin) */
+    color: #000000; /* Black text */
+  }
+  50% {
+    background-color: #87CEEB; /* Afternoon sky blue */
+    color: #000000; /* Black text */
+  }
+  100% {
+    background-color: #87CEEB; /* Afternoon sky blue */
+    color: #000000; /* Black text */
+  }
+}
+
+/* Button Styling */
+button {
+  background-color: #f0f0f0;
+  color: #000;
+  border: 2px solid #000;
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+
+button:hover {
+  background-color: #ddd;
+}
+
+body.sunset button {
+  background-color: #8B0000;
+  color: #FFD700;
+  border-color: #FFD700;
+}
+
+body.nightfall button {
+  background-color: #0d3b66;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+body.sunrise button {
+  background-color: #FF6A88;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+body.afternoon button {
+  background-color: #f0f0f0;
+  color: #000;
+  border-color: #000;
+}

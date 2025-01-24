@@ -104,15 +104,26 @@ function addActionsForHtmlUI () {
       const nextTheme = themes[nextThemeIndex];
       // Remove the current theme class
       document.body.classList.remove(currentTheme);
-      // If we are transitioning from sunrise to afternoon, use the special transition class from sunset.css
+      // If we are transitioning from sunrise to afternoon, use the special transition class from sunset.css to complete the day
       if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
         document.body.classList.add('afternoon-transition');
-      } else {
-        document.body.classList.remove('afternoon-transition');
-        document.body.classList.add(nextTheme);
+        sunsetButton.textContent = "I don't want to sleep anymore!"
+      } 
+      // If one day is already completed, send an alert and remove the button so the user can get some sleep
+      else if (sunsetButton.textContent == "I don't want to sleep anymore!") {
+        sunsetButton.textContent = "I will never listen to you!";
+        alert("You lived an entire day without sleeping. That is not healthy please go to sleep.");
       }
-      // Update the button text
-      sunsetButton.textContent = `Switch to ${themes[(nextThemeIndex + 1) % themes.length]}`;
+      else if (sunsetButton.textContent == "I will never listen to you!") {
+        alert("That is enough. You are grounded! I will remove the button so you have no choice but to sleep.")
+        sunsetButton.remove();
+      }
+      else {
+        document.body.classList.add(nextTheme);
+        // Update the button text
+        sunsetButton.textContent = `Switch to ${themes[(nextThemeIndex + 1) % themes.length]}`;
+      }
+  
       // Update the theme index
       currentThemeIndex = nextThemeIndex;
       };    

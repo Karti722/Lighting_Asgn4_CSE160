@@ -3,8 +3,9 @@
 var VSHADER_SOURCE = `
   attribute vec4 a_Position;
   uniform mat4 u_ModelMatrix;
+  uniform mat4 u_GlobalRotateMatrix;
   void main() {
-    gl_Position = u_ModelMatrix * a_Position;
+    gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     }`
 
 // Fragment shader program
@@ -22,6 +23,7 @@ var FSHADER_SOURCE = `
   let u_FragColor;
   let u_Size;
   let u_ModelMatrix;
+  let u_GlobalRotateMatrix;
 
 function setUpWebGL() {
   // Retrieve <canvas> element
@@ -68,6 +70,12 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, 'u_GlobalRotateMatrix');
+  if (!u_GlobalRotateMatrix) {
+    console.log("Failed to get the storage location of u_GlobalRotateMatrix");
+    return;
+  }
+
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
 
@@ -82,7 +90,8 @@ const CIRCLE = 2;
 let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
 let g_selected_size = 5;
 let g_selectedType = POINT;
-let numCircleSegs = 10;
+let g_globalAngle = 0;
+
 function addActionsForHtmlUI () {
     // Button events (Shape type)
     document.getElementById("green").onclick = function() { g_selectedColor = [0.0, 1.0, 0.0, 1.0] };
@@ -98,10 +107,16 @@ function addActionsForHtmlUI () {
     document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0] = this.value/100; });
     document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[1] = this.value/100; });
     document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[2] = this.value/100; });
-    document.getElementById("circleSlide").addEventListener('mouseup', function() { numCircleSegs = this.value; });
+    // document.getElementById("circleSlide").addEventListener('mouseup', function() { numCircleSegs = this.value; });
 
     // Size Slider elements
     document.getElementById('sizeSlide').addEventListener('mouseup', function(){ g_selected_size = this.value });
+
+    // Camera angle
+    document.getElementById('angleSlide').addEventListener('mouseup', function () {
+      g_globalAngle = this.value;
+      renderAllShapes();
+    });
 
 
     // Drawing I made for part 12 --> Drawing button 
@@ -204,13 +219,16 @@ function renderAllShapes () {
       // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
 
+  var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
+  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
+
   // var len = g_shapesList.length;
   // for(var i = 0; i < len; i++) {
   //   g_shapesList[i].render();
   // }
 
   // Draw triangle test
-  drawTriangle3D( [-1.0,0.0,0.0, -0.5,-1.0,0.0, 0.0,0.0,0.0] );
+  // drawTriangle3D( [-1.0,0.0,0.0, -0.5,-1.0,0.0, 0.0,0.0,0.0] );
 
   // Draw a Cube
   var body = new Cube();
@@ -226,5 +244,13 @@ function renderAllShapes () {
   leftArm.matrix.rotate(45, 0, 0, 1);
   leftArm.matrix.scale(0.25, 0.7, 0.5);
   leftArm.render();
-  
+
+  // Draw box
+  var box = new Cube();
+  box.color = [1, 0, 1, 1];
+  box.matrix.translate(0,-0.5,0);
+  box.matrix.rotate(30, 1, 0, 0);
+  box.matrix.scale(0.5,0.5,0.5);
+  box.render();
+
 }

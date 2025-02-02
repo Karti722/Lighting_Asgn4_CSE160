@@ -36,6 +36,7 @@ function setUpWebGL() {
     console.log('Failed to get the rendering context for WebGL');
     return;
   }
+  gl.enable(gl.DEPTH_TEST);
 }  
 
 
@@ -91,71 +92,37 @@ let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
 let g_selected_size = 5;
 let g_selectedType = POINT;
 let g_globalAngle = 0;
+let g_YellowAngle = 0;
+let g_MagentaAngle = 0;
 
 function addActionsForHtmlUI () {
-    // Button events (Shape type)
-    document.getElementById("green").onclick = function() { g_selectedColor = [0.0, 1.0, 0.0, 1.0] };
-    document.getElementById("red").onclick = function() { g_selectedColor = [1.0, 0.0, 0.0, 1.0] };
-    document.getElementById("clearButton").onclick = function() { g_shapesList = []; renderAllShapes() };
 
-    // Type of point
-    document.getElementById("pointButton").onclick = function() {g_selectedType = POINT};
-    document.getElementById("triButton").onclick = function() {g_selectedType = TRIANGLE};
-    document.getElementById("circleButton").onclick = function() {g_selectedType = CIRCLE};
 
-    //Slider events
-    document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0] = this.value/100; });
-    document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[1] = this.value/100; });
-    document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[2] = this.value/100; });
-    // document.getElementById("circleSlide").addEventListener('mouseup', function() { numCircleSegs = this.value; });
 
-    // Size Slider elements
-    document.getElementById('sizeSlide').addEventListener('mouseup', function(){ g_selected_size = this.value });
+    // yellow joint
+    document.getElementById('yellowSlide').addEventListener('mousemove', function(){
+       g_YellowAngle = this.value;
+       renderScene();
+       });
+
+    // 
+    document.getElementById('magentaSlide').addEventListener('mousemove', function(){
+      g_MagentaAngle = this.value;
+        renderScene();
+      });
 
     // Camera angle
-    document.getElementById('angleSlide').addEventListener('mouseup', function () {
+    document.getElementById('angleSlide').addEventListener('mousemove', function () {
       g_globalAngle = this.value;
-      renderAllShapes();
+      renderScene();
     });
 
 
-    // Drawing I made for part 12 --> Drawing button 
-    document.getElementById("drawingButton").onclick = function () {
-      g_shapesList = [];
-      for (let i = 0; i < 200; i++) {
-        let triangle = new Circle();
-        triangle.position = [Math.random() * 2 - 1, Math.random() * 2 - 1]; // Random position in the range [-1, 1]
-        triangle.size = Math.random() * 1; // Random size between 5 and 15
-        triangle.color = [1.0, 1.0, 1.0, 1.0]; // White color
-        g_shapesList.push(triangle);
-      }
-      renderAllShapes();
-    }
+
+
     
 
-    // A day-night cycle button made using CSS by the file sunset.css --> This is my submission for part 13
-    let sunsetButton = document.getElementById('toggleSunsetButton');
-    const themes = ['afternoon', 'sunset', 'nightfall', 'sunrise'];
-    let currentThemeIndex = 0; 
-    sunsetButton.onclick = function () {
-        const currentTheme = themes[currentThemeIndex];
-        const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
-        const nextTheme = themes[nextThemeIndex];
-        document.body.classList.remove(currentTheme);
-        if (currentTheme === 'sunrise' && nextTheme === 'afternoon') {
-          document.body.classList.add('afternoon-transition');
-          sunsetButton.textContent = "I don't want to sleep"
-        } 
-        else if (sunsetButton.textContent == "I don't want to sleep") {
-          alert("That is not healthy please go to sleep. I will remove the button now.");
-          sunsetButton.remove();
-        }
-        else {
-          document.body.classList.add(nextTheme);
-          sunsetButton.textContent = `Switch to ${themes[(nextThemeIndex + 1) % themes.length]}`;
-        }
-        currentThemeIndex = nextThemeIndex;
-    };    
+   
 }
 
 function main() {
@@ -176,7 +143,7 @@ function main() {
 
   // Clear <canvas>
   // gl.clear(gl.COLOR_BUFFER_BIT);
-  renderAllShapes();
+  renderScene();
 }
 
 var g_shapesList = [];
@@ -203,7 +170,7 @@ function click(ev) {
     g_shapesList.push(point);
 
     // Draw every shape that is supposed to be in the canvas
-    renderAllShapes();
+    renderScene();
 }
 
 function convertCoordinatesEventToGL (ev) {
@@ -215,9 +182,9 @@ function convertCoordinatesEventToGL (ev) {
     return [x, y];
 }
 
-function renderAllShapes () {
+// Rename this function to renderAllScene()
+function renderScene () {
       // Clear <canvas>
-  gl.clear(gl.COLOR_BUFFER_BIT);
 
   var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
@@ -229,6 +196,8 @@ function renderAllShapes () {
 
   // Draw triangle test
   // drawTriangle3D( [-1.0,0.0,0.0, -0.5,-1.0,0.0, 0.0,0.0,0.0] );
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
   // Draw a Cube
   var body = new Cube();
@@ -241,16 +210,18 @@ function renderAllShapes () {
   var leftArm = new Cube();
   leftArm.color = [1,1,0,1];
   leftArm.matrix.setTranslate(.7,0,0);
-  leftArm.matrix.rotate(45, 0, 0, 1);
+  leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
+  var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
   leftArm.matrix.scale(0.25, 0.7, 0.5);
   leftArm.render();
 
   // Draw box
   var box = new Cube();
   box.color = [1, 0, 1, 1];
-  box.matrix.translate(0,-0.5,0);
-  box.matrix.rotate(30, 1, 0, 0);
-  box.matrix.scale(0.5,0.5,0.5);
+  box.matrix = yellowCoordinatesMat;
+  box.matrix.translate(0,-0.3,0);
+  box.matrix.rotate(g_MagentaAngle, 1, 0, 0);
+  box.matrix.scale(0.3,0.5,0.5);
   box.render();
 
 }

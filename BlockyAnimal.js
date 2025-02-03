@@ -271,6 +271,14 @@ function renderScene () {
   leftEar.matrix.scale(0.2,0.2,0.2);
   leftEar.render();
 
+  // Left inner ear (red part)
+  var leftInnerEar = new Cube();
+  leftInnerEar.color = [1, 0, 0, 1];
+  leftInnerEar.matrix.rotate(45, 0, 0, 1);
+  leftInnerEar.matrix.translate(0.35, 0.25, 0.29);
+  leftInnerEar.matrix.scale(0.1,0.1,0.1);
+  leftInnerEar.render();
+
   var rightEar = new Cube();
   rightEar.color = [0.54, 0.27, 0.07, 1];
   rightEar.matrix.translate(-0.2, 0.35, 0.3);
@@ -278,6 +286,13 @@ function renderScene () {
   rightEar.matrix.scale(0.2,0.2,0.2);
   rightEar.render();
 
+  // right inner ear (red part)
+  var rightInnerEar = new Cube();
+  rightInnerEar.color = [1, 0, 0, 1];
+  rightInnerEar.matrix.translate(-0.2, 0.45, 0.29);
+  rightInnerEar.matrix.rotate(45, 0, 0, 1);
+  rightInnerEar.matrix.scale(0.1,0.1,0.1);
+  rightInnerEar.render();
 
   // red = [1, 0, 0, 1]
 
@@ -287,6 +302,37 @@ function renderScene () {
     body.matrix.scale(0.5, 1, 0.3);
     body.render();
 
+    // left eye
+   var leftEye = new Cube();
+   leftEye.color = [0, 0, 0, 1];
+   leftEye.matrix.translate(-0.2, 0.1, -0.5);
+   leftEye.matrix.translate(0, 0.2, 0.67);
+   leftEye.matrix.scale(.1, .1, .1);
+   leftEye.render();
+
+  //  right eye
+   var rightEye = new Cube();
+   rightEye.color = [0, 0, 0, 1];
+   rightEye.matrix.translate(-0.2, 0.1, -0.5);
+   rightEye.matrix.translate(0.2, 0.2, 0.67);
+   rightEye.matrix.scale(.1, .1, .1);
+   rightEye.render();
+
+  //  mouth
+  var mouth = new Cube ();
+  mouth.color = [1, 0, 0, 1];
+  mouth.matrix.translate(-0.4, -0.3, 0.1);
+  mouth.matrix.scale(.3, .1, .1);
+  mouth.matrix.translate(0.65, 2.5, 0.3);
+  mouth.render();
+
+  // teeth 
+  var teeth = new Cube();
+  teeth.color = [1, 1, 1,1];
+  teeth.matrix.translate(-0.4, -0.3, 0.1);
+  teeth.matrix.scale(.3, .05, .05);
+  teeth.matrix.translate(0.65, 6.5, 0.2);
+  teeth.render();
 
 
 }

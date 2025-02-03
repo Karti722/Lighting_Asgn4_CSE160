@@ -98,6 +98,7 @@ let g_animation = false;
 let g_rightArmAngle = 0;
 let g_leftLegAngle = 0;
 let g_rightLegAngle = 0;
+let shiftPressed = false;
 
 function addActionsForHtmlUI () {
 
@@ -136,6 +137,18 @@ function addActionsForHtmlUI () {
       renderScene();
     })
 
+    // Listen for keydown and keyup events to track the Shift key state
+  document.addEventListener('keydown', function(ev) {
+  if (ev.key === 'Shift') {
+    shiftPressed = true; // Shift key is pressed
+  }
+  });
+
+  document.addEventListener('keyup', function(ev) {
+  if (ev.key === 'Shift') {
+    shiftPressed = false; // Shift key is released
+  }
+});
    
 }
 
@@ -362,5 +375,20 @@ function renderScene () {
   teeth.matrix.scale(.3, .05, .05);
   teeth.matrix.translate(0.65, 6.5, 0.2);
   teeth.render();
+
+  // Yelling Sphere visual
+  // This sphere visual effect is supposed to mimick a bad TV static filter you would see when editing a video on tiktok
+  var staticSphere = new Sphere(); 
+  staticSphere.color = [1, 1, 1, 1]; 
+  staticSphere.matrix.setTranslate(0.0, -1.5, 0.0); 
+  staticSphere.matrix.scale(0.3, 0.3, 0.3); 
+
+  if (shiftPressed === true) {
+    // Animates visual TV static visual effect if shift key is pressed
+   staticSphere.matrix.translate(0, 5, 1)
+   staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
+   staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0); 
+  }
+  staticSphere.render(); 
 
 }

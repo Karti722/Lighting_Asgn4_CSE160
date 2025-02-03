@@ -94,6 +94,7 @@ let g_selectedType = POINT;
 let g_globalAngle = 0;
 let g_YellowAngle = 0;
 let g_MagentaAngle = 0;
+let g_animation = false;
 
 function addActionsForHtmlUI () {
 
@@ -118,7 +119,15 @@ function addActionsForHtmlUI () {
     });
 
 
+    // Toggles animation ON
+    document.getElementById('animationOnButton').onclick = function () {
+      g_animation = true;
+    };
 
+    // Toggles animation OFF
+    document.getElementById('animationOffButton').onclick = function () {
+      g_animation = false;
+    }
 
     
 
@@ -211,8 +220,7 @@ function renderScene () {
   //   g_shapesList[i].render();
   // }
 
-  // Draw triangle test
-  // drawTriangle3D( [-1.0,0.0,0.0, -0.5,-1.0,0.0, 0.0,0.0,0.0] );
+
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -222,8 +230,12 @@ function renderScene () {
   var leftArm = new Cube();
   leftArm.color =  [0.6, 0.27, 0.07, 1];
   leftArm.matrix.setTranslate(.18, 0.1,0.3);
-  // leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
-  leftArm.matrix.rotate(45*Math.sin(g_seconds) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
+  if (g_animation === true) {
+    leftArm.matrix.rotate(45*Math.sin(g_seconds) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
+  }
+  else {
+    leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
+  }
   // leftArm.matrix.translate((0.3 * Math.sin(-g_seconds/4) % 2), 0, 0, 0);
   // 90*Math.sin(g_seconds)
   var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
@@ -254,13 +266,19 @@ function renderScene () {
   // -0.3 * Math.sin(g_seconds) % 3
   leftLeg.matrix.translate(-0.3, -1, 0.3);
   leftLeg.matrix.scale(0.1, 0.5, 0.15);
+  if (g_animation === true) {
+    leftLeg.matrix.rotate(-45 * Math.sin(g_seconds), 1, 1, 1);
+  }  
   leftLeg.render();
 
   // rightLeg cube
   var rightLeg = new Cube();
   rightLeg.color = [0.54, 0.27, 0.07, 1];
   rightLeg.matrix.translate(0.1, -1, 0.4);
-  rightLeg.matrix.scale(0.1, 0.5, 0.15);  
+  rightLeg.matrix.scale(0.1, 0.5, 0.15);
+  if (g_animation === true) {
+    rightLeg.matrix.rotate(45 * Math.sin(g_seconds), 1, 1, 1);
+  }  
   rightLeg.render();
 
   // Fox ears
@@ -279,6 +297,7 @@ function renderScene () {
   leftInnerEar.matrix.scale(0.1,0.1,0.1);
   leftInnerEar.render();
 
+  // right ear
   var rightEar = new Cube();
   rightEar.color = [0.54, 0.27, 0.07, 1];
   rightEar.matrix.translate(-0.2, 0.35, 0.3);
@@ -300,6 +319,9 @@ function renderScene () {
     body.color = [0.54, 0.27, 0.07, 1];
     body.matrix.translate(-0.3, -0.5, 0.2);
     body.matrix.scale(0.5, 1, 0.3);
+    if (g_animation === true) {
+      body.matrix.translate(0.05 * Math.sin(g_seconds), 0, 0, 1);
+    }
     body.render();
 
     // left eye
@@ -333,6 +355,8 @@ function renderScene () {
   teeth.matrix.scale(.3, .05, .05);
   teeth.matrix.translate(0.65, 6.5, 0.2);
   teeth.render();
+
+  // feet 
 
 
 }

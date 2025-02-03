@@ -95,10 +95,11 @@ let g_globalAngle = 0;
 let g_YellowAngle = 0;
 let g_MagentaAngle = 0;
 let g_animation = false;
+let g_rightArmAngle = 0;
+let g_leftLegAngle = 0;
+let g_rightLegAngle = 0;
 
 function addActionsForHtmlUI () {
-
-
 
     // yellow joint
     document.getElementById('yellowSlide').addEventListener('mousemove', function(){
@@ -129,7 +130,11 @@ function addActionsForHtmlUI () {
       g_animation = false;
     }
 
-    
+    // Rotate left arm
+    document.getElementById("leftArmSlide").addEventListener('mousemove', function () {
+      g_rightArmAngle = this.value;
+      renderScene();
+    })
 
    
 }
@@ -236,8 +241,6 @@ function renderScene () {
   else {
     leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
   }
-  // leftArm.matrix.translate((0.3 * Math.sin(-g_seconds/4) % 2), 0, 0, 0);
-  // 90*Math.sin(g_seconds)
   var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
   leftArm.matrix.scale(0.1, 0.5, 0.15);
   leftArm.render();
@@ -247,13 +250,19 @@ function renderScene () {
   rightArm.color = [0.6, 0.27, 0.07, 1];
   rightArm.matrix.setRotate(135, 0, 0, 1);
   rightArm.matrix.setTranslate(-.4, -0.5, 0.3);
-  
   rightArm.matrix.scale(0.1, 0.5, 0.15);
+  if (g_animation === true) {
+    rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
+    rightArm.matrix.rotate(Math.abs((45 + g_rightArmAngle) * Math.sin(g_seconds)), 1, 1, 0);
+  }
+  else {
+    rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
+  }
   rightArm.render();
 
-  // Draw box
+  // Draw box --> Left tiny forearm
   var box = new Cube();
-  box.color = [1, 0, 1, 1];
+  box.color = [1, 1, 1, 1];
   box.matrix = yellowCoordinatesMat;
   box.matrix.translate(0,-0.1,0);
   box.matrix.rotate(g_MagentaAngle, 1, 0, 0);
@@ -263,7 +272,6 @@ function renderScene () {
   // leftLeg cube
   var leftLeg = new Cube();
   leftLeg.color = [0.54, 0.27, 0.07, 1];
-  // -0.3 * Math.sin(g_seconds) % 3
   leftLeg.matrix.translate(-0.3, -1, 0.3);
   leftLeg.matrix.scale(0.1, 0.5, 0.15);
   if (g_animation === true) {
@@ -313,16 +321,15 @@ function renderScene () {
   rightInnerEar.matrix.scale(0.1,0.1,0.1);
   rightInnerEar.render();
 
-  // red = [1, 0, 0, 1]
-
-    var body = new Cube();
-    body.color = [0.54, 0.27, 0.07, 1];
-    body.matrix.translate(-0.3, -0.5, 0.2);
-    body.matrix.scale(0.5, 1, 0.3);
-    if (g_animation === true) {
-      body.matrix.translate(0.05 * Math.sin(g_seconds), 0, 0, 1);
-    }
-    body.render();
+  // body or torso
+  var body = new Cube();
+  body.color = [0.54, 0.27, 0.07, 1];
+  body.matrix.translate(-0.3, -0.5, 0.2);
+  body.matrix.scale(0.5, 1, 0.3);
+  if (g_animation === true) {
+    body.matrix.translate(0.05 * Math.sin(g_seconds), 0, 0, 1);
+  }
+  body.render();
 
     // left eye
    var leftEye = new Cube();
@@ -355,8 +362,5 @@ function renderScene () {
   teeth.matrix.scale(.3, .05, .05);
   teeth.matrix.translate(0.65, 6.5, 0.2);
   teeth.render();
-
-  // feet 
-
 
 }

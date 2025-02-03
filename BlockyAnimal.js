@@ -151,7 +151,7 @@ var g_startTime = performance.now() / 1000.0;
 var g_seconds = performance.now() / 1000.0-g_startTime;
 
 function tick() {
-  console.log(performance.now());
+  // console.log(performance.now());
 
   g_seconds = performance.now() / 1000.0-g_startTime;
 
@@ -220,14 +220,24 @@ function renderScene () {
 
   // Draw a left arm
   var leftArm = new Cube();
-  leftArm.color = [1,1,0,1];
-  leftArm.matrix.setTranslate(.3,0,0);
+  leftArm.color =  [0.6, 0.27, 0.07, 1];
+  leftArm.matrix.setTranslate(.18, 0.1,0.3);
   // leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
-  leftArm.matrix.rotate(-175*Math.sin(g_seconds), 1, 1, 1);
-  leftArm.matrix.translate((0.3 * Math.sin(-g_seconds/4) % 2), 0, 0, 0);
+  leftArm.matrix.rotate(45*Math.sin(g_seconds) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
+  // leftArm.matrix.translate((0.3 * Math.sin(-g_seconds/4) % 2), 0, 0, 0);
+  // 90*Math.sin(g_seconds)
   var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
   leftArm.matrix.scale(0.1, 0.5, 0.15);
   leftArm.render();
+
+  // right Arm
+  var rightArm = new Cube();
+  rightArm.color = [0.6, 0.27, 0.07, 1];
+  rightArm.matrix.setRotate(135, 0, 0, 1);
+  rightArm.matrix.setTranslate(-.4, -0.5, 0.3);
+  
+  rightArm.matrix.scale(0.1, 0.5, 0.15);
+  rightArm.render();
 
   // Draw box
   var box = new Cube();
@@ -240,32 +250,43 @@ function renderScene () {
 
   // leftLeg cube
   var leftLeg = new Cube();
-  leftLeg.color = [1, 0, 1, 1];
-  leftLeg.matrix.translate(-0.3 * Math.sin(g_seconds) % 3, -1, 0.3);
+  leftLeg.color = [0.54, 0.27, 0.07, 1];
+  // -0.3 * Math.sin(g_seconds) % 3
+  leftLeg.matrix.translate(-0.3, -1, 0.3);
   leftLeg.matrix.scale(0.1, 0.5, 0.15);
   leftLeg.render();
 
   // rightLeg cube
   var rightLeg = new Cube();
-  rightLeg.color = [1, 0, 1, -1];
-  rightLeg.matrix.translate(-0.3 * Math.sin(g_seconds) % 3, -1, 0.4);
+  rightLeg.color = [0.54, 0.27, 0.07, 1];
+  rightLeg.matrix.translate(0.1, -1, 0.4);
   rightLeg.matrix.scale(0.1, 0.5, 0.15);  
   rightLeg.render();
 
   // Fox ears
   var leftEar = new Cube();
-  leftEar.color = [1, 1, 1, 1];
-  leftEar.matrix.rotate(185, 1, 1, 0);
-  leftEar.matrix.translate(2* Math.sin(g_seconds) % 3, 0.7, 0);
-  leftEar.matrix.scale(0.1,0.1,0.1);
+  leftEar.color = [0.54, 0.27, 0.07, 1];
+  leftEar.matrix.rotate(45, 0, 0, 1);
+  leftEar.matrix.translate(0.3, 0.2, 0.3);
+  leftEar.matrix.scale(0.2,0.2,0.2);
   leftEar.render();
 
+  var rightEar = new Cube();
+  rightEar.color = [0.54, 0.27, 0.07, 1];
+  rightEar.matrix.translate(-0.2, 0.35, 0.3);
+  rightEar.matrix.rotate(45, 0, 0, 1);
+  rightEar.matrix.scale(0.2,0.2,0.2);
+  rightEar.render();
 
-    // Draw a Cube
+
+  // red = [1, 0, 0, 1]
+
     var body = new Cube();
-    body.color = [1, 0, 0, 1];
-    body.matrix.translate(-0.3 * Math.sin(g_seconds), -0.5, 0.2);
+    body.color = [0.54, 0.27, 0.07, 1];
+    body.matrix.translate(-0.3, -0.5, 0.2);
     body.matrix.scale(0.5, 1, 0.3);
     body.render();
+
+
 
 }

@@ -143,8 +143,25 @@ function main() {
 
   // Clear <canvas>
   // gl.clear(gl.COLOR_BUFFER_BIT);
-  renderScene();
+  // renderScene();
+  requestAnimationFrame(tick);
 }
+
+var g_startTime = performance.now() / 1000.0;
+var g_seconds = performance.now() / 1000.0-g_startTime;
+
+function tick() {
+  console.log(performance.now());
+
+  g_seconds = performance.now() / 1000.0-g_startTime;
+
+  // Draw everything
+  renderScene();
+
+  // Tell the browser to update when it has time
+  requestAnimationFrame(tick);
+}
+
 
 var g_shapesList = [];
 
@@ -197,31 +214,58 @@ function renderScene () {
   // Draw triangle test
   // drawTriangle3D( [-1.0,0.0,0.0, -0.5,-1.0,0.0, 0.0,0.0,0.0] );
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  // gl.clear(gl.COLOR_BUFFER_BIT);
 
-  // Draw a Cube
-  var body = new Cube();
-  body.color = [1, 0, 0, 1];
-  body.matrix.translate(-0.25, -0.5, 0.0);
-  body.matrix.scale(0.5, 1, 0.5);
-  body.render();
+
 
   // Draw a left arm
   var leftArm = new Cube();
   leftArm.color = [1,1,0,1];
-  leftArm.matrix.setTranslate(.7,0,0);
-  leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
+  leftArm.matrix.setTranslate(.3,0,0);
+  // leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
+  leftArm.matrix.rotate(-175*Math.sin(g_seconds), 1, 1, 1);
+  leftArm.matrix.translate((0.3 * Math.sin(-g_seconds/4) % 2), 0, 0, 0);
   var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
-  leftArm.matrix.scale(0.25, 0.7, 0.5);
+  leftArm.matrix.scale(0.1, 0.5, 0.15);
   leftArm.render();
 
   // Draw box
   var box = new Cube();
   box.color = [1, 0, 1, 1];
   box.matrix = yellowCoordinatesMat;
-  box.matrix.translate(0,-0.3,0);
+  box.matrix.translate(0,-0.1,0);
   box.matrix.rotate(g_MagentaAngle, 1, 0, 0);
-  box.matrix.scale(0.3,0.5,0.5);
+  box.matrix.scale(0.09,0.1,0.1);
   box.render();
+
+  // leftLeg cube
+  var leftLeg = new Cube();
+  leftLeg.color = [1, 0, 1, 1];
+  leftLeg.matrix.translate(-0.3 * Math.sin(g_seconds) % 3, -1, 0.3);
+  leftLeg.matrix.scale(0.1, 0.5, 0.15);
+  leftLeg.render();
+
+  // rightLeg cube
+  var rightLeg = new Cube();
+  rightLeg.color = [1, 0, 1, -1];
+  rightLeg.matrix.translate(-0.3 * Math.sin(g_seconds) % 3, -1, 0.4);
+  rightLeg.matrix.scale(0.1, 0.5, 0.15);  
+  rightLeg.render();
+
+  // Fox ears
+  var leftEar = new Cube();
+  leftEar.color = [1, 1, 1, 1];
+  leftEar.matrix.rotate(185, 1, 1, 0);
+  leftEar.matrix.translate(2* Math.sin(g_seconds) % 3, 0.7, 0);
+  leftEar.matrix.scale(0.1,0.1,0.1);
+  leftEar.render();
+
+
+    // Draw a Cube
+    var body = new Cube();
+    body.color = [1, 0, 0, 1];
+    body.matrix.translate(-0.3 * Math.sin(g_seconds), -0.5, 0.2);
+    body.matrix.scale(0.5, 1, 0.3);
+    body.render();
 
 }

@@ -104,7 +104,7 @@ function addActionsForHtmlUI () {
 
     // yellow joint
     document.getElementById('yellowSlide').addEventListener('mousemove', function(){
-       g_YellowAngle = this.value;
+       g_YellowAngle = -1 * this.value;
        renderScene();
        });
 
@@ -131,8 +131,8 @@ function addActionsForHtmlUI () {
       g_animation = false;
     }
 
-    // Rotate left arm
-    document.getElementById("leftArmSlide").addEventListener('mousemove', function () {
+    // Rotate right arm
+    document.getElementById("rightArmSlide").addEventListener('mousemove', function () {
       g_rightArmAngle = this.value;
       renderScene();
     })
@@ -384,11 +384,43 @@ function renderScene () {
   staticSphere.matrix.scale(0.3, 0.3, 0.3); 
 
   if (shiftPressed === true) {
-    // Animates visual TV static visual effect if shift key is pressed
+    // Animates visual TV static visual effect if shift key is pressed, also the bear starts to act a little horror creepy
    staticSphere.matrix.translate(0, 5, 1)
    staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
-   staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0); 
+   staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0);
+    // move both eyes side to side 
+    leftEye.matrix.translate( .45 * Math.sin(g_seconds * 2), 0, 0);
+    leftEye.render(); 
+    rightEye.matrix.translate( -.45 * Math.sin(g_seconds * 2), 0, 0);
+    rightEye.render();
+
+    rightArm.matrix.rotate(180* Math.sin(g_seconds * 4), 1, 1, 1);
+    rightArm.render();
+
+    leftArm.matrix.rotate(180* Math.sin(g_seconds * 4), 1, 0, 0);
+    leftArm.render();
+
+    leftEar.matrix.rotate(Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    leftEar.render();
+
+    rightEar.matrix.rotate(-1 * Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    rightEar.render();
+
+    body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    body.render();
+
+    leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    leftLeg.render();
+
+    rightLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    rightLeg.render();
+
   }
   staticSphere.render(); 
+
+  // Bear nose
+  // var nose = new Sphere()
+  // nose.color = [0,0,0,1];
+  // nose.matrix.translate();
 
 }

@@ -99,6 +99,7 @@ let g_rightArmAngle = 0;
 let g_leftLegAngle = 0;
 let g_rightLegAngle = 0;
 let shiftPressed = false;
+let clicked = false;
 
 function addActionsForHtmlUI () {
 
@@ -149,6 +150,15 @@ function addActionsForHtmlUI () {
     shiftPressed = false; // Shift key is released
   }
 });
+
+  document.addEventListener('mousedown', function() {
+    clicked = true;
+  });
+
+  // When the mouse button is released, set mouseHeld to false
+  document.addEventListener('mouseup', function() {
+    clicked = false;
+  });
    
 }
 
@@ -177,17 +187,32 @@ function main() {
 var g_startTime = performance.now() / 1000.0;
 var g_seconds = performance.now() / 1000.0-g_startTime;
 
-function tick() {
-  // console.log(performance.now());
+var g_lastFrameTime = performance.now(); // Track last frame time
 
-  g_seconds = performance.now() / 1000.0-g_startTime;
+var g_lastFpsUpdateTime = performance.now(); // Track last FPS update time
+var g_fps = 0;
+
+function tick() {
+  var now = performance.now();
+  var deltaTime = now - g_lastFrameTime; // Time elapsed since last frame
+  g_lastFrameTime = now;
+
+  g_fps = 1000 / deltaTime; // Calculate FPS
+  g_seconds = now / 1000.0 - g_startTime;
+
+  // Update FPS display only once per second
+  if (now - g_lastFpsUpdateTime >= 1000) {
+    document.getElementById("FPS").innerText = g_fps.toFixed(2);
+    g_lastFpsUpdateTime = now; // Reset FPS update timer
+  }
 
   // Draw everything
   renderScene();
 
-  // Tell the browser to update when it has time
+  // Request next frame
   requestAnimationFrame(tick);
 }
+
 
 
 var g_shapesList = [];
@@ -240,7 +265,7 @@ function renderScene () {
 
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
 
 
@@ -376,6 +401,13 @@ function renderScene () {
   teeth.matrix.translate(0.65, 6.5, 0.2);
   teeth.render();
 
+    // Bear nose
+    var nose = new Sphere()
+    nose.color = [0,0,0,1];
+    nose.matrix.scale(.1, .1, .1);
+    nose.matrix.translate(0.1, 1.9, 1.45);
+    nose.render();
+
   // Yelling Sphere visual
   // This sphere visual effect is supposed to mimick a bad TV static filter you would see when editing a video on tiktok
   var staticSphere = new Sphere(); 
@@ -383,22 +415,20 @@ function renderScene () {
   staticSphere.matrix.setTranslate(0.0, -1.5, 0.0); 
   staticSphere.matrix.scale(0.3, 0.3, 0.3); 
 
-  if (shiftPressed === true) {
+  if (shiftPressed === true && clicked === true) {
     // Animates visual TV static visual effect if shift key is pressed, also the bear starts to act a little horror creepy
    staticSphere.matrix.translate(0, 5, 1)
    staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
    staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0);
-    // move both eyes side to side 
-    leftEye.matrix.translate( .45 * Math.sin(g_seconds * 2), 0, 0);
+    // Rest of if statement is devoted to distorting body parts so it looks like a horror movie
+    leftEye.matrix.translate( .5 * Math.sin(g_seconds * 2), 0, 0);
     leftEye.render(); 
-    rightEye.matrix.translate( -.45 * Math.sin(g_seconds * 2), 0, 0);
+    rightEye.matrix.translate( -.5 * Math.sin(g_seconds * 2), 0, 0);
     rightEye.render();
 
-    rightArm.matrix.rotate(180* Math.sin(g_seconds * 4), 1, 1, 1);
+    rightArm.matrix.translate(180* Math.sin(g_seconds * 4), 1, 1, 1);
+    rightArm.matrix.rotate(Math.cos(g_seconds * 6), 1, 1,1);
     rightArm.render();
-
-    leftArm.matrix.rotate(180* Math.sin(g_seconds * 4), 1, 0, 0);
-    leftArm.render();
 
     leftEar.matrix.rotate(Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
     leftEar.render();
@@ -409,18 +439,28 @@ function renderScene () {
     body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
     body.render();
 
-    leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 0, 0);
+    leftLeg.matrix.scale(1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
     leftLeg.render();
 
-    rightLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    rightLeg.matrix.rotate(1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    rightLeg.matrix.scale(-1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
     rightLeg.render();
+
+    teeth.matrix.scale(.1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
+    teeth.color = [1, 1, 1,1];
+    teeth.render();
+
+    mouth.matrix.scale(.05 * Math.cos(g_seconds * 6), 1, 1);
+    mouth.render();
+
+    nose.matrix.scale(1.25 * Math.cos(g_seconds * 6), 1, 1);
+    nose.render();
 
   }
   staticSphere.render(); 
 
-  // Bear nose
-  // var nose = new Sphere()
-  // nose.color = [0,0,0,1];
-  // nose.matrix.translate();
+ 
+
 
 }

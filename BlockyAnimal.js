@@ -100,67 +100,74 @@ let g_leftLegAngle = 0;
 let g_rightLegAngle = 0;
 let shiftPressed = false;
 let clicked = false;
+// camera angles for mouse rotation
+let g_globalAngleX = 0;
+let g_globalAngleY = 0;
+let isDragging = false;
+let lastMouseX = 0;
+let lastMouseY = 0;
 
-function addActionsForHtmlUI () {
 
-    // yellow joint
-    document.getElementById('yellowSlide').addEventListener('mousemove', function(){
-       g_YellowAngle = -1 * this.value;
-       renderScene();
-       });
+function addActionsForHtmlUI() {
+  document.getElementById('yellowSlide').addEventListener('mousemove', function() {
+      g_YellowAngle = -1 * this.value;
+      renderScene();
+  });
 
-    // 
-    document.getElementById('magentaSlide').addEventListener('mousemove', function(){
+  document.getElementById('magentaSlide').addEventListener('mousemove', function() {
       g_MagentaAngle = this.value;
-        renderScene();
-      });
+      renderScene();
+  });
 
-    // Camera angle
-    document.getElementById('angleSlide').addEventListener('mousemove', function () {
+  document.getElementById('angleSlide').addEventListener('mousemove', function () {
       g_globalAngle = this.value;
       renderScene();
-    });
+  });
 
-
-    // Toggles animation ON
-    document.getElementById('animationOnButton').onclick = function () {
+  document.getElementById('animationOnButton').onclick = function () {
       g_animation = true;
-    };
+  };
 
-    // Toggles animation OFF
-    document.getElementById('animationOffButton').onclick = function () {
+  document.getElementById('animationOffButton').onclick = function () {
       g_animation = false;
-    }
+  };
 
-    // Rotate right arm
-    document.getElementById("rightArmSlide").addEventListener('mousemove', function () {
+  document.getElementById("rightArmSlide").addEventListener('mousemove', function () {
       g_rightArmAngle = this.value;
       renderScene();
-    })
-
-    // Listen for keydown and keyup events to track the Shift key state
-  document.addEventListener('keydown', function(ev) {
-  if (ev.key === 'Shift') {
-    shiftPressed = true; // Shift key is pressed
-  }
   });
 
-  document.addEventListener('keyup', function(ev) {
-  if (ev.key === 'Shift') {
-    shiftPressed = false; // Shift key is released
-  }
-});
-
-  document.addEventListener('mousedown', function() {
-    clicked = true;
+  // Mouse events for rotation
+  canvas.addEventListener('mousedown', function(event) {
+      isDragging = true;
+      lastMouseX = event.clientX;
+      lastMouseY = event.clientY;
   });
 
-  // When the mouse button is released, set mouseHeld to false
-  document.addEventListener('mouseup', function() {
-    clicked = false;
+  canvas.addEventListener('mousemove', function(event) {
+      if (isDragging) {
+          let deltaX = event.clientX - lastMouseX;
+          let deltaY = event.clientY - lastMouseY;
+
+          g_globalAngleX += deltaY * 0.5;  // Map vertical movement to X rotation
+          g_globalAngleY += deltaX * 0.5;  // Map horizontal movement to Y rotation
+
+          lastMouseX = event.clientX;
+          lastMouseY = event.clientY;
+
+          renderScene();
+      }
   });
-   
+
+  canvas.addEventListener('mouseup', function() {
+      isDragging = false;
+  });
+
+  canvas.addEventListener('mouseleave', function() {
+      isDragging = false;
+  });
 }
+
 
 function main() {
     // Sets up WebGL canvas and context
@@ -268,6 +275,11 @@ function renderScene () {
   gl.clear(gl.COLOR_BUFFER_BIT);
 
 
+  var globalRotMat = new Matrix4()
+  .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
+  .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
+
+gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
   // Draw a left arm
   var leftArm = new Cube();

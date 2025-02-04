@@ -166,6 +166,31 @@ function addActionsForHtmlUI() {
   canvas.addEventListener('mouseleave', function() {
       isDragging = false;
   });
+
+     // Listen for keydown and keyup events to track the Shift key state
+     document.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Shift') {
+        shiftPressed = true; // Shift key is pressed
+      }
+      });
+    
+      document.addEventListener('keyup', function(ev) {
+      if (ev.key === 'Shift') {
+        shiftPressed = false; // Shift key is released
+      }
+    });
+    
+      document.addEventListener('mousedown', function() {
+        clicked = true;
+      });
+    
+      // When the mouse button is released, set mouseHeld to false
+      document.addEventListener('mouseup', function() {
+        clicked = false;
+      });
+
+
+
 }
 
 
@@ -278,6 +303,10 @@ function renderScene () {
   var globalRotMat = new Matrix4()
   .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
   .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
+
+  if (g_globalAngle > 0) {
+    globalRotMat.rotate(g_globalAngle, 0, 1, 0)
+  }
 
 gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
@@ -461,6 +490,7 @@ gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     rightEar.render();
 
     body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+    body.matrix.scale(Math.cos(g_seconds), Math.cos(g_seconds), 0);
     body.render();
 
     leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 0, 0);

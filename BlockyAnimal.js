@@ -490,7 +490,7 @@ gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     rightEar.render();
 
     body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
-    body.matrix.scale(Math.cos(g_seconds), Math.cos(g_seconds), 0);
+    body.matrix.scale(1.2 * Math.cos(g_seconds * 4), 1.2 * Math.cos(g_seconds * 4), 0);
     body.render();
 
     leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 0, 0);

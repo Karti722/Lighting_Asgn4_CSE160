@@ -274,7 +274,7 @@ function renderScene () {
   leftArm.color =  [0.6, 0.27, 0.07, 1];
   leftArm.matrix.setTranslate(.18, 0.1,0.3);
   if (g_animation === true) {
-    leftArm.matrix.rotate(45*Math.sin(g_seconds) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
+    leftArm.matrix.rotate(45*Math.sin(g_seconds * 6) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
   }
   else {
     leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
@@ -313,7 +313,7 @@ function renderScene () {
   leftLeg.matrix.translate(-0.3, -1, 0.3);
   leftLeg.matrix.scale(0.1, 0.5, 0.15);
   if (g_animation === true) {
-    leftLeg.matrix.rotate(-45 * Math.sin(g_seconds), 1, 1, 1);
+    leftLeg.matrix.rotate(-45 * Math.sin(g_seconds * 6), 1, 1, 1);
   }  
   leftLeg.render();
 
@@ -333,6 +333,9 @@ function renderScene () {
   leftEar.matrix.rotate(45, 0, 0, 1);
   leftEar.matrix.translate(0.3, 0.2, 0.3);
   leftEar.matrix.scale(0.2,0.2,0.2);
+  if (g_animation === true) {
+    leftEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 , 0.2);
+  }
   leftEar.render();
 
   // Left inner ear (red part)
@@ -341,6 +344,9 @@ function renderScene () {
   leftInnerEar.matrix.rotate(45, 0, 0, 1);
   leftInnerEar.matrix.translate(0.35, 0.25, 0.29);
   leftInnerEar.matrix.scale(0.1,0.1,0.1);
+  if (g_animation === true) {
+    leftInnerEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 ,0);
+  }
   leftInnerEar.render();
 
   // right ear
@@ -349,6 +355,9 @@ function renderScene () {
   rightEar.matrix.translate(-0.2, 0.35, 0.3);
   rightEar.matrix.rotate(45, 0, 0, 1);
   rightEar.matrix.scale(0.2,0.2,0.2);
+  if (g_animation === true) {
+    rightEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 ,0);
+  }
   rightEar.render();
 
   // right inner ear (red part)
@@ -357,6 +366,9 @@ function renderScene () {
   rightInnerEar.matrix.translate(-0.2, 0.45, 0.29);
   rightInnerEar.matrix.rotate(45, 0, 0, 1);
   rightInnerEar.matrix.scale(0.1,0.1,0.1);
+  if (g_animation === true) {
+    rightInnerEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 ,0);
+  }
   rightInnerEar.render();
 
   // body or torso
@@ -365,7 +377,7 @@ function renderScene () {
   body.matrix.translate(-0.3, -0.5, 0.2);
   body.matrix.scale(0.5, 1, 0.3);
   if (g_animation === true) {
-    body.matrix.translate(0.05 * Math.sin(g_seconds), 0, 0, 1);
+    body.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0, 0);
   }
   body.render();
 

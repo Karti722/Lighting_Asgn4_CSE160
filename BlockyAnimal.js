@@ -324,6 +324,7 @@ gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
   leftArm.matrix.scale(0.1, 0.5, 0.15);
   leftArm.render();
 
+
   // right Arm
   var rightArm = new Cube();
   rightArm.color = [0.6, 0.27, 0.07, 1];
@@ -454,14 +455,15 @@ gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
   teeth.matrix.translate(0.65, 6.5, 0.2);
   teeth.render();
 
-    // Bear nose
-    var nose = new Sphere()
-    nose.color = [0,0,0,1];
-    nose.matrix.scale(.1, .1, .1);
-    nose.matrix.translate(0.1, 1.9, 1.45);
-    nose.render();
+  // Bear nose
+  var nose = new Sphere()
+  nose.color = [0,0,0,1];
+  nose.matrix.scale(.1, .1, .1);
+  nose.matrix.translate(0.1, 1.9, 1.45);
+  nose.render();
 
-  // Yelling Sphere visual
+
+  // Static Sphere visual
   // This sphere visual effect is supposed to mimick a bad TV static filter you would see when editing a video on tiktok
   var staticSphere = new Sphere(); 
   staticSphere.color = [1, 1, 1, 1]; 

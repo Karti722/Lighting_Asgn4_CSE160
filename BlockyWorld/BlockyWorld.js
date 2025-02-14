@@ -122,7 +122,18 @@ function connectVariablesToGLSL() {
     return; 
   }
 
+  u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+  if (!u_ViewMatrix) {
+    console.log("Failed to get the storage location of u_ViewMatrix");
+    return;
+  }
 
+  u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
+  if (!u_ProjectionMatrix) {
+    console.log("Failed to get the storage location of u_projectionMatrix");
+    return;
+  }
+  
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
 
@@ -391,7 +402,13 @@ function renderScene () {
    var viewMat = new Matrix4();
    gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
 
-   var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
+   var globalRotMat = new Matrix4()
+   .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
+   .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
+ 
+   if (g_globalAngle > 0) {
+     globalRotMat.rotate(g_globalAngle, 0, 1, 0)
+   }
    gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
 
@@ -399,7 +416,7 @@ function renderScene () {
   gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
+
 
 
   // Draw a left arm

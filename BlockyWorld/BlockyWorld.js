@@ -10,7 +10,7 @@ var VSHADER_SOURCE = `
   uniform mat4 u_ViewMatrix;
   uniform mat4 u_ProjectionMatrix;
   void main() {
-    gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
+    gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
 
     }`
@@ -381,26 +381,23 @@ function sendImageToTEXTURE0(image){
 function renderScene () {
       // Clear <canvas>
 
-  var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
-  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
-  // var len = g_shapesList.length;
-  // for(var i = 0; i < len; i++) {
-  //   g_shapesList[i].render();
-  // }
+
+  // Pass the projection matrix
+   var projMat = new Matrix4();
+   gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
+
+  //  Pass the view matrix
+   var viewMat = new Matrix4();
+   gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
+
+   var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
+   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-
-  var globalRotMat = new Matrix4()
-  .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
-  .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
-
-  if (g_globalAngle > 0) {
-    globalRotMat.rotate(g_globalAngle, 0, 1, 0)
-  }
 
 gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 

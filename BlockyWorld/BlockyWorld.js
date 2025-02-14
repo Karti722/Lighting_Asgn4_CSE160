@@ -49,19 +49,19 @@ var FSHADER_SOURCE = `
   let u_GlobalRotateMatrix;
   let u_Sampler0;
   let u_whichTexture;
+  let camera;
 
 function setUpWebGL() {
-  // Retrieve <canvas> element
-  canvas = document.getElementById('webgl');
+    // Retrieve <canvas> element
+    canvas = document.getElementById('webgl');
 
-  // Get the rendering context for WebGL
-//   gl = getWebGLContext(canvas);
+    // Get the rendering context for WebGL
     gl = canvas.getContext('webgl', {preserveDrawingBuffer: true})
-  if (!gl) {
-    console.log('Failed to get the rendering context for WebGL');
-    return;
-  }
-  gl.enable(gl.DEPTH_TEST);
+    if (!gl) {
+      console.log('Failed to get the rendering context for WebGL');
+      return;
+    }
+    gl.enable(gl.DEPTH_TEST);
 }  
 
 
@@ -91,7 +91,6 @@ function connectVariablesToGLSL() {
     return;
   }
 
-
   u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
   if (!u_ModelMatrix) {
     console.log('Failed to get the storage location of u_ModelMatrix');
@@ -103,12 +102,6 @@ function connectVariablesToGLSL() {
     console.log("Failed to get the storage location of u_GlobalRotateMatrix");
     return;
   }
-
-  // u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-  // if (!u_ViewMatrix) {
-  //   console.log("Failed to get the storage location of u_ViewMatrix");
-  //   return; 
-  // }
 
   u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
   if (!u_Sampler0) {
@@ -259,6 +252,9 @@ function main() {
 
   initTextures(gl, 0);
 
+  // Instantiate the global camera object
+  camera = new Camera(60, [0, 0, 4], [0, 0, -100], [0, 1, 0]);
+
   // Register function (event handler) to be called on a mouse press
   canvas.onmousedown = click;
   canvas.onmousemove = function(ev) { if (ev.buttons == 1) { click(ev) }  };
@@ -266,10 +262,40 @@ function main() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-  // Clear <canvas>
-  // gl.clear(gl.COLOR_BUFFER_BIT);
-  // renderScene();
+  // requestAnimationFrame for animation
   requestAnimationFrame(tick);
+
+  // Add event listeners for camera controls
+  document.addEventListener('keydown', function(ev) {
+      console.log(ev.key);
+      switch (ev.key) {
+          case 'W':
+          case 'w':
+              camera.moveForward(0.1);
+              break;
+          case 'S':
+          case 's':
+              camera.moveBackward(0.1);
+              break;
+          case 'A':
+          case 'a':
+              camera.moveLeft(0.1);
+              break;
+          case 'D':
+          case 'd':
+              camera.moveRight(0.1);
+              break;
+          case 'Q':
+          case 'q':
+              camera.panLeft(1.5);
+              break;
+          case 'E':
+          case 'e':
+              camera.panRight(1.5);
+              break;
+      }
+      renderScene();
+  });
 }
 
 var g_startTime = performance.now() / 1000.0;
@@ -392,237 +418,216 @@ function sendImageToTEXTURE0(image){
 
 
 
-function renderScene () {
+function renderScene() {
+    // Pass the projection matrix
+    gl.uniformMatrix4fv(u_ProjectionMatrix, false, camera.projectionMatrix.elements);
 
-  // Pass the projection matrix
-   var projMat = new Matrix4();
-   projMat.setPerspective(60, canvas.width/canvas.height, .1, 100);
-   gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
+    // Pass the view matrix
+    gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
 
-  //  Pass the view matrix
-   var viewMat = new Matrix4();
-   viewMat.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
-   gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
+    var globalRotMat = new Matrix4()
+        .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
+        .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
 
-   var globalRotMat = new Matrix4()
-   .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
-   .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
- 
-   if (g_globalAngle > 0) {
-     globalRotMat.rotate(g_globalAngle, 0, 1, 0)
-   }
-   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
+    if (g_globalAngle > 0) {
+        globalRotMat.rotate(g_globalAngle, 0, 1, 0);
+    }
+    gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+    // Draw a left arm
+    var leftArm = new Cube();
+    leftArm.color = [0.6, 0.27, 0.07, 1];
+    leftArm.matrix.setTranslate(.18, 0.1, 0.3);
+    if (g_animation === true) {
+        leftArm.matrix.rotate(45 * Math.sin(g_seconds * 6) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
+    } else {
+        leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
+    }
+    var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
+    leftArm.matrix.scale(0.1, 0.5, 0.15);
+    leftArm.render();
 
-  // Draw a left arm
-  var leftArm = new Cube();
-  leftArm.color =  [0.6, 0.27, 0.07, 1];
-  leftArm.matrix.setTranslate(.18, 0.1,0.3);
-  if (g_animation === true) {
-    leftArm.matrix.rotate(45*Math.sin(g_seconds * 6) - 35 - g_YellowAngle - g_MagentaAngle, 1, 0, 1);
-  }
-  else {
-    leftArm.matrix.rotate(g_YellowAngle, 0, 0, 1);
-  }
-  var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
-  leftArm.matrix.scale(0.1, 0.5, 0.15);
-  leftArm.render();
-
-
-  // right Arm
-  var rightArm = new Cube();
-  rightArm.color = [0.6, 0.27, 0.07, 1];
-  rightArm.matrix.setRotate(135, 0, 0, 1);
-  rightArm.matrix.setTranslate(-.4, -0.5, 0.3);
-  rightArm.matrix.scale(0.1, 0.5, 0.15);
-  if (g_animation === true) {
-    rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
-    rightArm.matrix.rotate(Math.abs((45 + g_rightArmAngle) * Math.sin(g_seconds)), 1, 1, 0);
-  }
-  else {
-    rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
-  }
-  rightArm.render();
-
-  // Draw box --> Left tiny forearm
-  var box = new Cube();
-  box.color = [1, 1, 1, 1];
-  box.matrix = yellowCoordinatesMat;
-  box.matrix.translate(0,-0.1,0);
-  box.matrix.rotate(g_MagentaAngle, 1, 0, 0);
-  box.matrix.scale(0.09,0.1,0.1);
-  box.render();
-
-  // leftLeg cube
-  var leftLeg = new Cube();
-  leftLeg.color = [0.54, 0.27, 0.07, 1];
-  leftLeg.matrix.translate(-0.3, -1, 0.3);
-  leftLeg.matrix.scale(0.1, 0.5, 0.15);
-  if (g_animation === true) {
-    leftLeg.matrix.rotate(-45 * Math.sin(g_seconds * 6), 1, 1, 1);
-  }  
-  leftLeg.render();
-
-  // rightLeg cube
-  var rightLeg = new Cube();
-  rightLeg.color = [0.54, 0.27, 0.07, 1];
-  rightLeg.matrix.translate(0.1, -1, 0.4);
-  rightLeg.matrix.scale(0.1, 0.5, 0.15);
-  if (g_animation === true) {
-    rightLeg.matrix.rotate(45 * Math.sin(g_seconds), 1, 1, 1);
-  }  
-  rightLeg.render();
-
-  // Fox ears
-  var leftEar = new Cube();
-  leftEar.color = [0.54, 0.27, 0.07, 1];
-  leftEar.matrix.rotate(45, 0, 0, 1);
-  leftEar.matrix.translate(0.3, 0.2, 0.3);
-  leftEar.matrix.scale(0.2,0.2,0.2);
-  if (g_animation === true) {
-    leftEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 , 0.2);
-  }
-  leftEar.render();
-
-  // Left inner ear (red part)
-  var leftInnerEar = new Cube();
-  leftInnerEar.color = [1, 0, 0, 1];
-  leftInnerEar.matrix.rotate(45, 0, 0, 1);
-  leftInnerEar.matrix.translate(0.35, 0.25, 0.29);
-  leftInnerEar.matrix.scale(0.1,0.1,0.1);
-  if (g_animation === true) {
-    leftInnerEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 ,0);
-  }
-  leftInnerEar.render();
-
-  // right ear
-  var rightEar = new Cube();
-  rightEar.color = [0.54, 0.27, 0.07, 1];
-  rightEar.matrix.translate(-0.2, 0.35, 0.3);
-  rightEar.matrix.rotate(45, 0, 0, 1);
-  rightEar.matrix.scale(0.2,0.2,0.2);
-  if (g_animation === true) {
-    rightEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 ,0);
-  }
-  rightEar.render();
-
-  // right inner ear (red part)
-  var rightInnerEar = new Cube();
-  rightInnerEar.color = [1, 0, 0, 1];
-  rightInnerEar.matrix.translate(-0.2, 0.45, 0.29);
-  rightInnerEar.matrix.rotate(45, 0, 0, 1);
-  rightInnerEar.matrix.scale(0.1,0.1,0.1);
-  if (g_animation === true) {
-    rightInnerEar.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0 ,0);
-  }
-  rightInnerEar.render();
-
-  // body or torso
-  var body = new Cube();
-  body.color = [0.54, 0.27, 0.07, 1];
-  body.matrix.translate(-0.3, -0.5, 0.2);
-  body.matrix.scale(0.5, 1, 0.3);
-  if (g_animation === true) {
-    body.matrix.translate(0.04 * Math.sin(g_seconds * 6), 0, 0);
-  }
-  body.render();
-
-    // left eye
-   var leftEye = new Cube();
-   leftEye.color = [0, 0, 0, 1];
-   leftEye.matrix.translate(-0.2, 0.1, -0.5);
-   leftEye.matrix.translate(0, 0.2, 0.67);
-   leftEye.matrix.scale(.1, .1, .1);
-   leftEye.render();
-
-  //  right eye
-   var rightEye = new Cube();
-   rightEye.color = [0, 0, 0, 1];
-   rightEye.matrix.translate(-0.2, 0.1, -0.5);
-   rightEye.matrix.translate(0.2, 0.2, 0.67);
-   rightEye.matrix.scale(.1, .1, .1);
-   rightEye.render();
-
-  //  mouth
-  var mouth = new Cube ();
-  mouth.color = [1, 0, 0, 1];
-  mouth.matrix.translate(-0.4, -0.3, 0.1);
-  mouth.matrix.scale(.3, .1, .1);
-  mouth.matrix.translate(0.65, 2.5, 0.3);
-  mouth.render();
-
-  // teeth 
-  var teeth = new Cube();
-  teeth.color = [1, 1, 1,1];
-  teeth.matrix.translate(-0.4, -0.3, 0.1);
-  teeth.matrix.scale(.3, .05, .05);
-  teeth.matrix.translate(0.65, 6.5, 0.2);
-  teeth.render();
-
-  // Bear nose
-  var nose = new Sphere()
-  nose.color = [0,0,0,1];
-  nose.matrix.scale(.1, .1, .1);
-  nose.matrix.translate(0.1, 1.9, 1.45);
-  nose.render();
-
-
-  // Static Sphere visual
-  // This sphere visual effect is supposed to mimick a bad TV static filter you would see when editing a video on tiktok
-  var staticSphere = new Sphere(); 
-  staticSphere.color = [1, 1, 1, 1]; 
-  staticSphere.matrix.setTranslate(0.0, -1.5, 0.0); 
-  staticSphere.matrix.scale(0.3, 0.3, 0.3); 
-
-  if (shiftPressed === true && clicked === true) {
-    // Animates visual TV static visual effect if shift key is pressed, also the bear starts to act a little horror creepy
-   staticSphere.matrix.translate(0, 5, 1)
-   staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
-   staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0);
-    // Rest of if statement is devoted to distorting body parts so it looks like a horror movie
-    leftEye.matrix.translate( .5 * Math.sin(g_seconds * 2), 0, 0);
-    leftEye.render(); 
-    rightEye.matrix.translate( -.5 * Math.sin(g_seconds * 2), 0, 0);
-    rightEye.render();
-
-    rightArm.matrix.translate(180* Math.sin(g_seconds * 4), 1, 1, 1);
-    rightArm.matrix.rotate(Math.cos(g_seconds * 6), 1, 1,1);
+    // right Arm
+    var rightArm = new Cube();
+    rightArm.color = [0.6, 0.27, 0.07, 1];
+    rightArm.matrix.setRotate(135, 0, 0, 1);
+    rightArm.matrix.setTranslate(-.4, -0.5, 0.3);
+    rightArm.matrix.scale(0.1, 0.5, 0.15);
+    if (g_animation === true) {
+        rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
+        rightArm.matrix.rotate(Math.abs((45 + g_rightArmAngle) * Math.sin(g_seconds)), 1, 1, 0);
+    } else {
+        rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
+    }
     rightArm.render();
 
-    leftEar.matrix.rotate(Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
-    leftEar.render();
+    // Draw box --> Left tiny forearm
+    var box = new Cube();
+    box.color = [1, 1, 1, 1];
+    box.matrix = yellowCoordinatesMat;
+    box.matrix.translate(0, -0.1, 0);
+    box.matrix.rotate(g_MagentaAngle, 1, 0, 0);
+    box.matrix.scale(0.09, 0.1, 0.1);
+    box.render();
 
-    rightEar.matrix.rotate(-1 * Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
-    rightEar.render();
-
-    body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
-    body.matrix.scale(1.2 * Math.cos(g_seconds * 4), 1.2 * Math.cos(g_seconds * 4), 0);
-    body.render();
-
-    leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 0, 0);
-    leftLeg.matrix.scale(1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
+    // leftLeg cube
+    var leftLeg = new Cube();
+    leftLeg.color = [0.54, 0.27, 0.07, 1];
+    leftLeg.matrix.translate(-0.3, -1, 0.3);
+    leftLeg.matrix.scale(0.1, 0.5, 0.15);
+    if (g_animation === true) {
+        leftLeg.matrix.rotate(-45 * Math.sin(g_seconds * 6), 1, 1, 1);
+    }
     leftLeg.render();
 
-    rightLeg.matrix.rotate(1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
-    rightLeg.matrix.scale(-1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
+    // rightLeg cube
+    var rightLeg = new Cube();
+    rightLeg.color = [0.54, 0.27, 0.07, 1];
+    rightLeg.matrix.translate(0.1, -1, 0.4);
+    rightLeg.matrix.scale(0.1, 0.5, 0.15);
+    if (g_animation === true) { }
     rightLeg.render();
 
-    teeth.matrix.scale(.1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
-    teeth.color = [1, 1, 1,1];
-    teeth.render();
+    // Fox ears
+    var leftEar = new Cube();
+    leftEar.color = [0.54, 0.27, 0.07, 1];
+    leftEar.matrix.rotate(45, 0, 0, 1);
+    leftEar.matrix.translate(0.3, 0.2, 0.3);
+    leftEar.matrix.scale(0.2, 0.2, 0.2);
+    if (g_animation === true) { }
+    leftEar.render();
 
-    mouth.matrix.scale(.05 * Math.cos(g_seconds * 6), 1, 1);
+    // Left inner ear (red part)
+    var leftInnerEar = new Cube();
+    leftInnerEar.color = [1, 0, 0, 1];
+    leftInnerEar.matrix.rotate(45, 0, 0, 1);
+    leftInnerEar.matrix.translate(0.35, 0.25, 0.29);
+    leftInnerEar.matrix.scale(0.1, 0.1, 0.1);
+    if (g_animation === true) { }
+    leftInnerEar.render();
+
+    // right ear
+    var rightEar = new Cube();
+    rightEar.color = [0.54, 0.27, 0.07, 1];
+    rightEar.matrix.translate(-0.2, 0.35, 0.3);
+    rightEar.matrix.rotate(45, 0, 0, 1);
+    rightEar.matrix.scale(0.2, 0.2, 0.2);
+    if (g_animation === true) { }
+    rightEar.render();
+
+    // right inner ear (red part)
+    var rightInnerEar = new Cube();
+    rightInnerEar.color = [1, 0, 0, 1];
+    rightInnerEar.matrix.translate(-0.2, 0.45, 0.29);
+    rightInnerEar.matrix.rotate(45, 0, 0, 1);
+    rightInnerEar.matrix.scale(0.1, 0.1, 0.1);
+    if (g_animation === true) { }
+    rightInnerEar.render();
+
+    // body or torso
+    var body = new Cube();
+    body.color = [0.54, 0.27, 0.07, 1];
+    body.matrix.translate(-0.3, -0.5, 0.2);
+    body.matrix.scale(0.5, 1, 0.3);
+    if (g_animation === true) { }
+    body.render();
+
+    // left eye
+    var leftEye = new Cube();
+    leftEye.color = [0, 0, 0, 1];
+    leftEye.matrix.translate(-0.2, 0.1, -0.5);
+    leftEye.matrix.translate(0, 0.2, 0.67);
+    leftEye.matrix.scale(.1, .1, .1);
+    if (g_animation === true) { }
+    leftEye.render();
+
+    // right eye
+    var rightEye = new Cube();
+    rightEye.color = [0, 0, 0, 1];
+    rightEye.matrix.translate(-0.2, 0.1, -0.5);
+    rightEye.matrix.translate(0.2, 0.2, 0.67);
+    rightEye.matrix.scale(.1, .1, .1);
+    if (g_animation === true) { }
+    rightEye.render();
+
+    // mouth
+    var mouth = new Cube();
+    mouth.color = [1, 0, 0, 1];
+    mouth.matrix.translate(-0.4, -0.3, 0.1);
+    mouth.matrix.scale(.3, .1, .1);
+    mouth.matrix.translate(0.65, 2.5, 0.3);
+    if (g_animation === true) { }
     mouth.render();
 
-    nose.matrix.scale(1.25 * Math.cos(g_seconds * 6), 1, 1);
+    // teeth
+    var teeth = new Cube();
+    teeth.color = [1, 1, 1, 1];
+    teeth.matrix.translate(-0.4, -0.3, 0.1);
+    teeth.matrix.scale(.3, .05, .05);
+    teeth.matrix.translate(0.65, 6.5, 0.2);
+    if (g_animation === true) { }
+    teeth.render();
+
+    // Bear nose
+    var nose = new Sphere();
+    nose.color = [0, 0, 0, 1];
+    nose.matrix.scale(.1, .1, .1);
+    nose.matrix.translate(0.1, 1.9, 1.45);
+    if (g_animation === true) { }
     nose.render();
 
-  }
+    // Static Sphere visual
+    // This sphere visual effect is supposed to mimick a bad TV static filter you would see when editing a video on tiktok
+    var staticSphere = new Sphere();
+    staticSphere.color = [1, 1, 1, 1];
+    staticSphere.matrix.setTranslate(0.0, -1.5, 0.0);
+    staticSphere.matrix.scale(0.3, 0.3, 0.3);
 
- 
+    if (shiftPressed === true && clicked === true) {
+        // Animates visual TV static visual effect if shift key is pressed, also the bear starts to act a little horror creepy
+        staticSphere.matrix.translate(0, 5, 1)
+        staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
+        staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0);
+        // Rest of if statement is devoted to distorting body parts so it looks like a horror movie
+        leftEye.matrix.translate(.5 * Math.sin(g_seconds * 2), 0, 0);
+        leftEye.render();
+        rightEye.matrix.translate(-.5 * Math.sin(g_seconds * 2), 0, 0);
+        rightEye.render();
 
+        rightArm.matrix.translate(180 * Math.sin(g_seconds * 4), 1, 1, 1);
+        rightArm.matrix.rotate(Math.cos(g_seconds * 6), 1, 1, 1);
+        rightArm.render();
 
+        leftEar.matrix.rotate(Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
+        leftEar.render();
+
+        rightEar.matrix.rotate(-1 * Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
+        rightEar.render();
+
+        body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+        body.matrix.scale(1.2 * Math.cos(g_seconds * 4), 1.2 * Math.cos(g_seconds * 4), 0);
+        body.render();
+
+        leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 0, 0);
+        leftLeg.matrix.scale(1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
+        leftLeg.render();
+
+        rightLeg.matrix.rotate(1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
+        rightLeg.matrix.scale(-1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
+        rightLeg.render();
+
+        teeth.matrix.scale(.1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
+        teeth.color = [1, 1, 1, 1];
+        teeth.render();
+
+        mouth.matrix.scale(.05 * Math.cos(g_seconds * 6), 1, 1);
+        mouth.render();
+
+        nose.matrix.scale(1.25 * Math.cos(g_seconds * 6), 1, 1);
+        nose.render();
+
+    }
 }

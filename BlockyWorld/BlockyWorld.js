@@ -21,10 +21,19 @@ var FSHADER_SOURCE = `
   varying vec2 v_UV;
   uniform vec4 u_FragColor;  // uniform
   uniform sampler2D u_Sampler0;
+  uniform int u_whichTexture;
   void main() {
+    
+    if (u_whichTexture == -2) {
     gl_FragColor = u_FragColor;
-    gl_FragColor = vec4(v_UV,1.0,1.0);
-    gl_FragColor = texture2D(u_Sampler0, v_UV);
+    } else if (u_whichTexture == -1) {
+     gl_FragColor = vec4(v_UV, 1.0, 1.0);
+    } else if (u_whichTexture == 0) {
+      gl_FragColor = texture2D(u_Sampler0, v_UV);
+    } else {
+      gl_FragColor = vec4(1, .2, .2, 1);
+    }
+
   }`
 
 //   Global Variables
@@ -39,6 +48,7 @@ var FSHADER_SOURCE = `
   let u_ViewMatrix;
   let u_GlobalRotateMatrix;
   let u_Sampler0;
+  let u_whichTexture;
 
 function setUpWebGL() {
   // Retrieve <canvas> element
@@ -104,6 +114,12 @@ function connectVariablesToGLSL() {
   if (!u_Sampler0) {
     console.log('Failed to get the storage location of u_Sampler0');
     return;
+  }
+
+  u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture');
+  if (!u_whichTexture) {
+    console.log('Failed to get the storage location of u_whichTexture');
+    return; 
   }
 
 

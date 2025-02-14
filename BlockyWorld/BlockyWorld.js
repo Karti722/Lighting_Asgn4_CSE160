@@ -1,28 +1,40 @@
 // ColoredPoint.js (c) 2012 matsuda
 // Vertex shader program
 var VSHADER_SOURCE = `
+  precision mediump float;
   attribute vec4 a_Position;
+  attribute vec2 a_UV;
+  varying vec2 v_UV;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
+  uniform mat4 u_ViewMatrix;
+  uniform mat4 u_ProjectionMatrix;
   void main() {
     gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
+    v_UV = a_UV;
+
     }`
 
 // Fragment shader program
 var FSHADER_SOURCE = `
   precision mediump float;
+  varying vec2 v_UV;
   uniform vec4 u_FragColor;  // uniform
   void main() {
     gl_FragColor = u_FragColor;
+    gl_FragColor = vec4(v_UV,1.0,1.0);
   }`
 
 //   Global Variables
   let canvas;
   let gl;
   let a_Position;
+  let a_UV;
   let u_FragColor;
   let u_Size;
   let u_ModelMatrix;
+  let u_ProjectionMatrix;
+  let u_ViewMatrix;
   let u_GlobalRotateMatrix;
 
 function setUpWebGL() {
@@ -52,6 +64,13 @@ function connectVariablesToGLSL() {
     console.log('Failed to get the storage location of a_Position');
     return;
   }
+
+  a_UV = gl.getAttribLocation(gl.program, 'a_UV');
+  if (a_UV < 0) {
+    console.log('Failed to get the storage location of a_UV');
+    return;
+  }
+
   // Get the storage location of u_FragColor
   u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
   if (!u_FragColor) {
@@ -59,11 +78,6 @@ function connectVariablesToGLSL() {
     return;
   }
 
-  // u_Size = gl.getUniformLocation(gl.program, 'u_Size');
-  // if (!u_Size) {
-  //   console.log('Failed to get the storage location of u_Size');
-  //   return;
-  // }
 
   u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
   if (!u_ModelMatrix) {
@@ -76,6 +90,12 @@ function connectVariablesToGLSL() {
     console.log("Failed to get the storage location of u_GlobalRotateMatrix");
     return;
   }
+
+  // u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+  // if (!u_ViewMatrix) {
+  //   console.log("Failed to get the storage location of u_ViewMatrix");
+  //   return; 
+  // }
 
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
@@ -309,6 +329,7 @@ function renderScene () {
   }
 
 gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
+
 
   // Draw a left arm
   var leftArm = new Cube();

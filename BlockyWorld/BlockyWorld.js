@@ -437,6 +437,24 @@ function renderScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+
+    // Draw the ground using a cube
+    var ground = new Cube();
+    ground.color = [0, 1, 0.1, 1];
+    ground.textureNum = -2;
+    ground.matrix.setTranslate(-10, -1, -10);
+    ground.matrix.scale(50, 0.06, 50);
+    ground.render();
+
+    // Draw the blue sky box
+    var sky = new Sphere();
+    sky.color = [0.529, 0.808, 0.922, 1];
+    sky.textureNum = 0;
+    sky.matrix.setTranslate(-10, -10, -10);
+    sky.matrix.scale(75, 75, 75);
+    sky.render();
+
+
     // Draw a left arm
     var leftArm = new Cube();
     leftArm.color = [0.6, 0.27, 0.07, 1];

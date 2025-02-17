@@ -447,9 +447,10 @@ function renderScene() {
     ground.render();
 
     // Draw the blue sky box
-    var sky = new Sphere();
+    var sky = new Cube();
+    sky.textureNum = -2;
     sky.color = [0.529, 0.808, 0.922, 1];
-    sky.textureNum = 0;
+    sky.textureNum = -2;
     sky.matrix.setTranslate(-10, -10, -10);
     sky.matrix.scale(75, 75, 75);
     sky.render();

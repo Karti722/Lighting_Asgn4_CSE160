@@ -3,7 +3,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Draw a point (1)</title>
+    <title>BlockyWorld</title>
+    <style>
+        #story {
+            display: none;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
   </head>
 
   <body onload="main()">
@@ -40,6 +49,15 @@
 
     <br>
     <p>Hold the shift and mouse keys to activate nightmare mode. The bear distorts with TV static filter, and it is hypnotizing</p>
+
+    <button id="showStoryButton">Show Story</button>
+    <button id="hideStoryButton" style="display:none;">Hide Story</button>
+    <div id="story">
+        <p>Once upon a time in a blocky world...</p>
+        <p>There were many colorful shapes living in harmony.</p>
+        <p>One day, a mysterious force started animating them...</p>
+        <p>And they began to move and interact in fascinating ways.</p>
+    </div>
 
     <script src="../lib/webg-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>

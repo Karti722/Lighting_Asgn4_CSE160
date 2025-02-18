@@ -158,88 +158,102 @@ let lastMouseX = 0;
 let lastMouseY = 0;
 
 
-function addActionsForHtmlUI() {
-  document.getElementById('yellowSlide').addEventListener('mousemove', function() {
-      g_YellowAngle = -1 * this.value;
-      renderScene();
-  });
-
-  document.getElementById('magentaSlide').addEventListener('mousemove', function() {
-      g_MagentaAngle = this.value;
-      renderScene();
-  });
-
-  document.getElementById('angleSlide').addEventListener('mousemove', function () {
-      g_globalAngle = this.value;
-      renderScene();
-  });
-
-  document.getElementById('animationOnButton').onclick = function () {
-      g_animation = true;
-  };
-
-  document.getElementById('animationOffButton').onclick = function () {
-      g_animation = false;
-  };
-
-  document.getElementById("rightArmSlide").addEventListener('mousemove', function () {
-      g_rightArmAngle = this.value;
-      renderScene();
-  });
-
-  // Mouse events for rotation
-  canvas.addEventListener('mousedown', function(event) {
-      isDragging = true;
-      lastMouseX = event.clientX;
-      lastMouseY = event.clientY;
-  });
-
-  canvas.addEventListener('mousemove', function(event) {
-      if (isDragging) {
-          let deltaX = event.clientX - lastMouseX;
-          let deltaY = event.clientY - lastMouseY;
-
-          g_globalAngleX += deltaY * 0.5;  // Map vertical movement to X rotation
-          g_globalAngleY += deltaX * 0.5;  // Map horizontal movement to Y rotation
-
-          lastMouseX = event.clientX;
-          lastMouseY = event.clientY;
-
-          renderScene();
-      }
-  });
-
-  canvas.addEventListener('mouseup', function() {
-      isDragging = false;
-  });
-
-  canvas.addEventListener('mouseleave', function() {
-      isDragging = false;
-  });
-
-     // Listen for keydown and keyup events to track the Shift key state
-     document.addEventListener('keydown', function(ev) {
-      if (ev.key === 'Shift') {
-        shiftPressed = true; // Shift key is pressed
-      }
-      });
-    
-      document.addEventListener('keyup', function(ev) {
-      if (ev.key === 'Shift') {
-        shiftPressed = false; // Shift key is released
-      }
-    });
-    
-      document.addEventListener('mousedown', function() {
-        clicked = true;
-      });
-    
-      // When the mouse button is released, set mouseHeld to false
-      document.addEventListener('mouseup', function() {
-        clicked = false;
-      });
+function showStory() {
+    document.getElementById('story').style.display = 'block';
+    document.getElementById('showStoryButton').style.display = 'none';
+    document.getElementById('hideStoryButton').style.display = 'inline';
 }
 
+function hideStory() {
+    document.getElementById('story').style.display = 'none';
+    document.getElementById('showStoryButton').style.display = 'inline';
+    document.getElementById('hideStoryButton').style.display = 'none';
+}
+
+function addActionsForHtmlUI() {
+    document.getElementById('yellowSlide').addEventListener('mousemove', function() {
+        g_YellowAngle = -1 * this.value;
+        renderScene();
+    });
+
+    document.getElementById('magentaSlide').addEventListener('mousemove', function() {
+        g_MagentaAngle = this.value;
+        renderScene();
+    });
+
+    document.getElementById('angleSlide').addEventListener('mousemove', function () {
+        g_globalAngle = this.value;
+        renderScene();
+    });
+
+    document.getElementById('animationOnButton').onclick = function () {
+        g_animation = true;
+    };
+
+    document.getElementById('animationOffButton').onclick = function () {
+        g_animation = false;
+    };
+
+    document.getElementById("rightArmSlide").addEventListener('mousemove', function () {
+        g_rightArmAngle = this.value;
+        renderScene();
+    });
+
+    document.getElementById('showStoryButton').onclick = showStory;
+    document.getElementById('hideStoryButton').onclick = hideStory;
+
+    // Mouse events for rotation
+    canvas.addEventListener('mousedown', function(event) {
+        isDragging = true;
+        lastMouseX = event.clientX;
+        lastMouseY = event.clientY;
+    });
+
+    canvas.addEventListener('mousemove', function(event) {
+        if (isDragging) {
+            let deltaX = event.clientX - lastMouseX;
+            let deltaY = event.clientY - lastMouseY;
+
+            g_globalAngleX += deltaY * 0.5;  // Map vertical movement to X rotation
+            g_globalAngleY += deltaX * 0.5;  // Map horizontal movement to Y rotation
+
+            lastMouseX = event.clientX;
+            lastMouseY = event.clientY;
+
+            renderScene();
+        }
+    });
+
+    canvas.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+
+    canvas.addEventListener('mouseleave', function() {
+        isDragging = false;
+    });
+
+    // Listen for keydown and keyup events to track the Shift key state
+    document.addEventListener('keydown', function(ev) {
+        if (ev.key === 'Shift') {
+            shiftPressed = true; // Shift key is pressed
+        }
+    });
+
+    document.addEventListener('keyup', function(ev) {
+        if (ev.key === 'Shift') {
+            shiftPressed = false; // Shift key is released
+        }
+    });
+
+    document.addEventListener('mousedown', function() {
+        clicked = true;
+    });
+
+    // When the mouse button is released, set mouseHeld to false
+    document.addEventListener('mouseup', function() {
+        clicked = false;
+    });
+}
 
 function main() {
     // Sets up WebGL canvas and context

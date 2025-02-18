@@ -271,19 +271,19 @@ function main() {
       switch (ev.key) {
           case 'W':
           case 'w':
-              camera.moveForward(0.1);
+              camera.moveForward(1);
               break;
           case 'S':
           case 's':
-              camera.moveBackward(0.1);
+              camera.moveBackward(1);
               break;
           case 'A':
           case 'a':
-              camera.moveLeft(0.1);
+              camera.moveLeft(1.5);
               break;
           case 'D':
           case 'd':
-              camera.moveRight(0.1);
+              camera.moveRight(1.5);
               break;
           case 'Q':
           case 'q':
@@ -426,7 +426,7 @@ function renderScene() {
     gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
 
     var globalRotMat = new Matrix4()
-        .rotate(g_globalAngleY, 0, 1, 0)  // Rotate around Y-axis
+        .rotate(g_globalAngleY + 180, 0, 1, 0)  // Rotate around Y-axis
         .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
 
     if (g_globalAngle > 0) {
@@ -437,24 +437,41 @@ function renderScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-
     // Draw the ground using a cube
     var ground = new Cube();
-    ground.color = [0, 1, 0.1, 1];
+    ground.color = [0.76, 0.70, 0.50, 1];
     ground.textureNum = -2;
     ground.matrix.setTranslate(-10, -1, -10);
     ground.matrix.scale(50, 0.06, 50);
+    ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
     ground.render();
+
+    var ocean = new Cube();
+    ocean.color = [0.0, 0.0, 1.0, 1];
+    ocean.textureNum = -2;
+    ocean.matrix.setTranslate(-10, -1, -10);
+    ocean.matrix.scale(100, 0.06, 100);
 
     // Draw the blue sky box
     var sky = new Cube();
-    sky.textureNum = -2;
     sky.color = [0.529, 0.808, 0.922, 1];
     sky.textureNum = -2;
     sky.matrix.setTranslate(-10, -10, -10);
     sky.matrix.scale(75, 75, 75);
+    sky.matrix.rotate(g_seconds * 12, g_seconds * 12, g_seconds * 12, g_seconds * 12);
     sky.render();
 
+    // Draw houses and roofs
+    drawHouse(-5, -1, -5);
+    drawHouse(5, -1, -5);
+    drawHouse(-5, -1, 5);
+    drawHouse(5, -1, 5);
+
+    // Draw rain
+    drawRain();
+
+    // Draw clouds
+    drawClouds();
 
     // Draw a left arm
     var leftArm = new Cube();
@@ -599,18 +616,15 @@ function renderScene() {
     nose.render();
 
     // Static Sphere visual
-    // This sphere visual effect is supposed to mimick a bad TV static filter you would see when editing a video on tiktok
     var staticSphere = new Sphere();
     staticSphere.color = [1, 1, 1, 1];
     staticSphere.matrix.setTranslate(0.0, -1.5, 0.0);
     staticSphere.matrix.scale(0.3, 0.3, 0.3);
 
     if (shiftPressed === true && clicked === true) {
-        // Animates visual TV static visual effect if shift key is pressed, also the bear starts to act a little horror creepy
         staticSphere.matrix.translate(0, 5, 1)
         staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
         staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0);
-        // Rest of if statement is devoted to distorting body parts so it looks like a horror movie
         leftEye.matrix.translate(.5 * Math.sin(g_seconds * 2), 0, 0);
         leftEye.render();
         rightEye.matrix.translate(-.5 * Math.sin(g_seconds * 2), 0, 0);
@@ -647,6 +661,44 @@ function renderScene() {
 
         nose.matrix.scale(1.25 * Math.cos(g_seconds * 6), 1, 1);
         nose.render();
+    }
+}
 
+function drawHouse(x, y, z) {
+    var house = new Cube();
+    house.color = [0.8, 0.5, 0.2, 1];
+    house.textureNum = -2;
+    house.matrix.setTranslate(x, y, z);
+    house.matrix.scale(2, 2, 2);
+    house.render();
+
+    var roof = new Cube();
+    roof.color = [0.5, 0.2, 0.2, 1];
+    roof.textureNum = -2;
+    roof.matrix.setTranslate(x, y + 2, z);
+    roof.matrix.scale(2.2, 0.5, 2.2);
+    roof.render();
+}
+
+function drawRain() {
+    for (let i = 0; i < 50; i++) { // Reduced number of raindrops
+        var rainDrop = new Sphere();
+        rainDrop.color = [0.0, 0.0, 1.0, 1];
+        rainDrop.matrix.setTranslate(Math.random() * 20 - 10, Math.random() * 10 - (g_seconds % 10), Math.random() * 20 - 10);
+        rainDrop.matrix.scale(0.05, 0.05, 0.05);
+        rainDrop.render();
+    }
+}
+
+function drawClouds() {
+    for (let i = 0; i < 3; i++) { // Reduced number of clouds
+        var cloud = new Sphere();
+        cloud.color = [1.0, 1.0, 1.0, 1];
+        var angle = g_seconds * 20 + i * 120; // 120 degrees apart for 3 clouds
+        var x = 10 * Math.cos(angle * Math.PI / 180);
+        var z = 10 * Math.sin(angle * Math.PI / 180);
+        cloud.matrix.setTranslate(x, 5, z);
+        cloud.matrix.scale(2, 1, 1.5); // Distort the sphere to look like a cloud
+        cloud.render();
     }
 }

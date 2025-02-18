@@ -1,0 +1,74 @@
+<!-- HelloPoint1.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>BlockyWorld</title>
+    <style>
+        #story {
+            display: none;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+  </head>
+
+  <body onload="main()">
+    <h1>Frames Per Second: </h1>
+    <h2 id="FPS">FPS</h2>
+
+    <p>Hold down the mouse key and drag to rotate the bear. You can also use the camera slider though, it only rotates across the y-axis</p>
+
+    <br>
+    <canvas id="webgl" width="1280" height="720">
+    Please use a browser that supports "canvas"
+    </canvas>
+
+
+    <p>
+    Camera Angle <input type="range" min="5" max="90" value="5" class="slider" id="angleSlide">
+
+    <p>
+      Rotate latter giant arm <input type="range" min="5" max="90" value="5" class="slider" id="yellowSlide">
+
+    <p>
+        Rotate tiny forearm <input type="range" min="5" max="90" value="5" class="slider" id="magentaSlide">
+
+    <p>
+      Animation toggle (Bear says hi while scratching his itchy leg)
+    <br>
+      <button type="button" id="animationOnButton">ON</button>
+
+    <p>
+      <button type="button" id="animationOffButton">OFF</button>
+
+    <br>
+    Itchiness on leg meter  <input type="range" min="5" max="90" value="5" class="slider" id="rightArmSlide">
+
+    <br>
+    <p>Hold the shift and mouse keys to activate nightmare mode. The bear distorts with TV static filter, and it is hypnotizing</p>
+
+    <button id="showStoryButton">Show Story</button>
+    <button id="hideStoryButton" style="display:none;">Hide Story</button>
+    <div id="story">
+        <p>Once upon a time in a blocky world...</p>
+        <p>There were many colorful shapes living in harmony.</p>
+        <p>One day, a mysterious force started animating them...</p>
+        <p>And they began to move and interact in fascinating ways.</p>
+    </div>
+
+    <script src="../lib/webg-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix.js"></script>
+    <script src="BlockyWorld/Triangle.js"></script>
+    <script src="BlockyWorld/Cube.js"></script>
+    <script src="BlockyWorld/Circle.js"></script>
+    <script src="BlockyWorld/Point.js"></script>
+    <script src="BlockyWorld/Sphere.js"></script>
+    <script src="BlockyWorld/camera.js"></script>
+    <script src="BlockyWorld/BlockyWorld.js"></script>
+  </body>
+</html>

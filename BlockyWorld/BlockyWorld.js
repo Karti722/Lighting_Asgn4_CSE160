@@ -431,6 +431,24 @@ function sendImageToTEXTURE0(image){
   var g_up=[0,1,0];
 
 
+  function drawTree(x, y, z) {
+    // Draw the trunk
+    var trunk = new Cube();
+    trunk.color = [0.55, 0.27, 0.07, 1];
+    trunk.textureNum = -2;
+    trunk.matrix.setTranslate(x, y, z);
+    trunk.matrix.scale(0.5, 2, 0.5);
+    trunk.render();
+
+    // Draw the leaves
+    var leaves = new Sphere();
+    leaves.color = [0.0, 0.8, 0.0, 1];
+    leaves.textureNum = -2;
+    leaves.matrix.setTranslate(x, y + 2, z);
+    leaves.matrix.scale(1.5, 1.5, 1.5);
+    leaves.render();
+}
+
 
 function renderScene() {
     // Pass the projection matrix
@@ -451,10 +469,19 @@ function renderScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    drawTree(-7, -1, -3);
+    drawTree(4, -1, -3);
+    drawTree(10, -1, 3);
+    drawTree(-12, -1, 3);
+    drawTree(14, -1, 3);
+    drawTree(16, -1, 3);
+    drawTree(-16, -1, 3);
+    drawTree(20, -1, 3);
+
     // Draw the ground using a cube
     var ground = new Cube();
     ground.color = [0.76, 0.70, 0.50, 1];
-    ground.textureNum = -2;
+    ground.textureNum = 0;
     ground.matrix.setTranslate(-10, -1, -10);
     ground.matrix.scale(50, 0.06, 50);
     ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
@@ -464,7 +491,7 @@ function renderScene() {
     ocean.color = [0.0, 0.0, 1.0, 1];
     ocean.textureNum = -2;
     ocean.matrix.setTranslate(-10, -1, -10);
-    ocean.matrix.scale(100, 0.06, 100);
+    ocean.matrix.scale(70, 0.06, 70);
 
     // Draw the blue sky box
     var sky = new Cube();

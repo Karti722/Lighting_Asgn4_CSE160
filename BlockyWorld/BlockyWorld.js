@@ -504,18 +504,13 @@ function renderScene() {
 
     // Draw houses and roofs
     drawHouse(-5, -1, -5);
-    drawHouse(5, -1, -5);
-    drawHouse(-5, -1, 5);
-    drawHouse(5, -1, 5);
-
-    // Draw rain
-    drawRain();
 
     // Draw clouds
     drawClouds();
 
     // Draw a left arm
     var leftArm = new Cube();
+    leftArm.textureNum = -2;
     leftArm.color = [0.6, 0.27, 0.07, 1];
     leftArm.matrix.setTranslate(.18, 0.1, 0.3);
     if (g_animation === true) {
@@ -529,6 +524,7 @@ function renderScene() {
 
     // right Arm
     var rightArm = new Cube();
+    rightArm.textureNum = -2;
     rightArm.color = [0.6, 0.27, 0.07, 1];
     rightArm.matrix.setRotate(135, 0, 0, 1);
     rightArm.matrix.setTranslate(-.4, -0.5, 0.3);
@@ -543,6 +539,7 @@ function renderScene() {
 
     // Draw box --> Left tiny forearm
     var box = new Cube();
+    box.textureNum = -2;
     box.color = [1, 1, 1, 1];
     box.matrix = yellowCoordinatesMat;
     box.matrix.translate(0, -0.1, 0);
@@ -552,6 +549,7 @@ function renderScene() {
 
     // leftLeg cube
     var leftLeg = new Cube();
+    leftLeg.textureNum = -2;
     leftLeg.color = [0.54, 0.27, 0.07, 1];
     leftLeg.matrix.translate(-0.3, -1, 0.3);
     leftLeg.matrix.scale(0.1, 0.5, 0.15);
@@ -562,6 +560,7 @@ function renderScene() {
 
     // rightLeg cube
     var rightLeg = new Cube();
+    rightLeg.textureNum = -2;
     rightLeg.color = [0.54, 0.27, 0.07, 1];
     rightLeg.matrix.translate(0.1, -1, 0.4);
     rightLeg.matrix.scale(0.1, 0.5, 0.15);
@@ -570,6 +569,7 @@ function renderScene() {
 
     // Fox ears
     var leftEar = new Cube();
+    leftEar.textureNum = -2;
     leftEar.color = [0.54, 0.27, 0.07, 1];
     leftEar.matrix.rotate(45, 0, 0, 1);
     leftEar.matrix.translate(0.3, 0.2, 0.3);
@@ -579,6 +579,7 @@ function renderScene() {
 
     // Left inner ear (red part)
     var leftInnerEar = new Cube();
+    leftInnerEar.textureNum = -2;
     leftInnerEar.color = [1, 0, 0, 1];
     leftInnerEar.matrix.rotate(45, 0, 0, 1);
     leftInnerEar.matrix.translate(0.35, 0.25, 0.29);
@@ -588,6 +589,7 @@ function renderScene() {
 
     // right ear
     var rightEar = new Cube();
+    rightEar.textureNum = -2;
     rightEar.color = [0.54, 0.27, 0.07, 1];
     rightEar.matrix.translate(-0.2, 0.35, 0.3);
     rightEar.matrix.rotate(45, 0, 0, 1);
@@ -597,6 +599,7 @@ function renderScene() {
 
     // right inner ear (red part)
     var rightInnerEar = new Cube();
+    rightInnerEar.textureNum = -2;
     rightInnerEar.color = [1, 0, 0, 1];
     rightInnerEar.matrix.translate(-0.2, 0.45, 0.29);
     rightInnerEar.matrix.rotate(45, 0, 0, 1);
@@ -606,6 +609,7 @@ function renderScene() {
 
     // body or torso
     var body = new Cube();
+    body.textureNum = -2;
     body.color = [0.54, 0.27, 0.07, 1];
     body.matrix.translate(-0.3, -0.5, 0.2);
     body.matrix.scale(0.5, 1, 0.3);
@@ -614,6 +618,7 @@ function renderScene() {
 
     // left eye
     var leftEye = new Cube();
+    leftEye.textureNum = -2;
     leftEye.color = [0, 0, 0, 1];
     leftEye.matrix.translate(-0.2, 0.1, -0.5);
     leftEye.matrix.translate(0, 0.2, 0.67);
@@ -623,6 +628,7 @@ function renderScene() {
 
     // right eye
     var rightEye = new Cube();
+    rightEye.textureNum = -2;
     rightEye.color = [0, 0, 0, 1];
     rightEye.matrix.translate(-0.2, 0.1, -0.5);
     rightEye.matrix.translate(0.2, 0.2, 0.67);
@@ -632,6 +638,7 @@ function renderScene() {
 
     // mouth
     var mouth = new Cube();
+    mouth.textureNum = -2;
     mouth.color = [1, 0, 0, 1];
     mouth.matrix.translate(-0.4, -0.3, 0.1);
     mouth.matrix.scale(.3, .1, .1);
@@ -641,6 +648,7 @@ function renderScene() {
 
     // teeth
     var teeth = new Cube();
+    teeth.textureNum = -2;
     teeth.color = [1, 1, 1, 1];
     teeth.matrix.translate(-0.4, -0.3, 0.1);
     teeth.matrix.scale(.3, .05, .05);
@@ -650,6 +658,7 @@ function renderScene() {
 
     // Bear nose
     var nose = new Sphere();
+    nose.textureNum = -2;
     nose.color = [0, 0, 0, 1];
     nose.matrix.scale(.1, .1, .1);
     nose.matrix.translate(0.1, 1.9, 1.45);
@@ -658,6 +667,7 @@ function renderScene() {
 
     // Static Sphere visual
     var staticSphere = new Sphere();
+    staticSphere.textureNum = -2;
     staticSphere.color = [1, 1, 1, 1];
     staticSphere.matrix.setTranslate(0.0, -1.5, 0.0);
     staticSphere.matrix.scale(0.3, 0.3, 0.3);

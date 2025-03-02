@@ -501,7 +501,7 @@ function renderScene() {
     // Draw the ground using a cube
     var ground = new Cube();
     ground.color = [0.76, 0.70, 0.50, 1];
-    ground.textureNum = -2;
+    ground.textureNum = g_normalOn ? -3 : 0;
     ground.matrix.setTranslate(-10, -1, -10);
     ground.matrix.scale(50, 0.06, 50);
     ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
@@ -509,22 +509,17 @@ function renderScene() {
 
     var ocean = new Cube();
     ocean.color = [0.0, 0.0, 1.0, 1];
-    ocean.textureNum = -2;
+    ocean.textureNum = g_normalOn ? -3 : 0;
     ocean.matrix.setTranslate(-10, -1, -10);
     ocean.matrix.scale(70, 0.06, 70);
+    ocean.render();
 
     // Draw the blue sky box
     var sky = new Cube();
-    if (g_normalOn) {
-        sky.textureNum = -3;
-    }
-    else {
-        sky.textureNum = -2;
-    }
+    sky.textureNum = g_normalOn ? -3 : -2;
     sky.color = [0.529, 0.808, 0.922, 1];
     sky.matrix.setTranslate(-10, -10, -10);
     sky.matrix.scale(25, 25, 25);
-    // sky.matrix.rotate(g_seconds * 12, g_seconds * 12, g_seconds * 12, g_seconds * 12);
     sky.render();
 
     // Draw houses and roofs
@@ -535,7 +530,7 @@ function renderScene() {
 
     // Draw a left arm
     var leftArm = new Cube();
-    leftArm.textureNum = -2;
+    leftArm.textureNum = g_normalOn ? -3 : -2;
     leftArm.color = [0.6, 0.27, 0.07, 1];
     leftArm.matrix.setTranslate(.18, 0.1, 0.3);
     if (g_animation === true) {
@@ -549,7 +544,7 @@ function renderScene() {
 
     // right Arm
     var rightArm = new Cube();
-    rightArm.textureNum = -2;
+    rightArm.textureNum = g_normalOn ? -3 : -2;
     rightArm.color = [0.6, 0.27, 0.07, 1];
     rightArm.matrix.setRotate(135, 0, 0, 1);
     rightArm.matrix.setTranslate(-.4, -0.5, 0.3);
@@ -564,7 +559,7 @@ function renderScene() {
 
     // Draw box --> Left tiny forearm
     var box = new Cube();
-    box.textureNum = -2;
+    box.textureNum = g_normalOn ? -3 : -2;
     box.color = [1, 1, 1, 1];
     box.matrix = yellowCoordinatesMat;
     box.matrix.translate(0, -0.1, 0);
@@ -574,7 +569,7 @@ function renderScene() {
 
     // leftLeg cube
     var leftLeg = new Cube();
-    leftLeg.textureNum = -2;
+    leftLeg.textureNum = g_normalOn ? -3 : -2;
     leftLeg.color = [0.54, 0.27, 0.07, 1];
     leftLeg.matrix.translate(-0.3, -1, 0.3);
     leftLeg.matrix.scale(0.1, 0.5, 0.15);
@@ -585,7 +580,7 @@ function renderScene() {
 
     // rightLeg cube
     var rightLeg = new Cube();
-    rightLeg.textureNum = -2;
+    rightLeg.textureNum = g_normalOn ? -3 : -2;
     rightLeg.color = [0.54, 0.27, 0.07, 1];
     rightLeg.matrix.translate(0.1, -1, 0.4);
     rightLeg.matrix.scale(0.1, 0.5, 0.15);
@@ -594,7 +589,7 @@ function renderScene() {
 
     // Fox ears
     var leftEar = new Cube();
-    leftEar.textureNum = -2;
+    leftEar.textureNum = g_normalOn ? -3 : -2;
     leftEar.color = [0.54, 0.27, 0.07, 1];
     leftEar.matrix.rotate(45, 0, 0, 1);
     leftEar.matrix.translate(0.3, 0.2, 0.3);
@@ -604,7 +599,7 @@ function renderScene() {
 
     // Left inner ear (red part)
     var leftInnerEar = new Cube();
-    leftInnerEar.textureNum = -2;
+    leftInnerEar.textureNum = g_normalOn ? -3 : -2;
     leftInnerEar.color = [1, 0, 0, 1];
     leftInnerEar.matrix.rotate(45, 0, 0, 1);
     leftInnerEar.matrix.translate(0.35, 0.25, 0.29);
@@ -614,7 +609,7 @@ function renderScene() {
 
     // right ear
     var rightEar = new Cube();
-    rightEar.textureNum = -2;
+    rightEar.textureNum = g_normalOn ? -3 : -2;
     rightEar.color = [0.54, 0.27, 0.07, 1];
     rightEar.matrix.translate(-0.2, 0.35, 0.3);
     rightEar.matrix.rotate(45, 0, 0, 1);
@@ -624,7 +619,7 @@ function renderScene() {
 
     // right inner ear (red part)
     var rightInnerEar = new Cube();
-    rightInnerEar.textureNum = -2;
+    rightInnerEar.textureNum = g_normalOn ? -3 : -2;
     rightInnerEar.color = [1, 0, 0, 1];
     rightInnerEar.matrix.translate(-0.2, 0.45, 0.29);
     rightInnerEar.matrix.rotate(45, 0, 0, 1);
@@ -634,7 +629,7 @@ function renderScene() {
 
     // body or torso
     var body = new Cube();
-    body.textureNum = -2;
+    body.textureNum = g_normalOn ? -3 : -2;
     body.color = [0.54, 0.27, 0.07, 1];
     body.matrix.translate(-0.3, -0.5, 0.2);
     body.matrix.scale(0.5, 1, 0.3);
@@ -643,7 +638,7 @@ function renderScene() {
 
     // left eye
     var leftEye = new Cube();
-    leftEye.textureNum = -2;
+    leftEye.textureNum = g_normalOn ? -3 : -2;
     leftEye.color = [0, 0, 0, 1];
     leftEye.matrix.translate(-0.2, 0.1, -0.5);
     leftEye.matrix.translate(0, 0.2, 0.67);
@@ -653,7 +648,7 @@ function renderScene() {
 
     // right eye
     var rightEye = new Cube();
-    rightEye.textureNum = -2;
+    rightEye.textureNum = g_normalOn ? -3 : -2;
     rightEye.color = [0, 0, 0, 1];
     rightEye.matrix.translate(-0.2, 0.1, -0.5);
     rightEye.matrix.translate(0.2, 0.2, 0.67);
@@ -663,7 +658,7 @@ function renderScene() {
 
     // mouth
     var mouth = new Cube();
-    mouth.textureNum = -2;
+    mouth.textureNum = g_normalOn ? -3 : -2;
     mouth.color = [1, 0, 0, 1];
     mouth.matrix.translate(-0.4, -0.3, 0.1);
     mouth.matrix.scale(.3, .1, .1);
@@ -673,7 +668,7 @@ function renderScene() {
 
     // teeth
     var teeth = new Cube();
-    teeth.textureNum = -2;
+    teeth.textureNum = g_normalOn ? -3 : -2;
     teeth.color = [1, 1, 1, 1];
     teeth.matrix.translate(-0.4, -0.3, 0.1);
     teeth.matrix.scale(.3, .05, .05);
@@ -683,7 +678,7 @@ function renderScene() {
 
     // Bear nose
     var nose = new Sphere();
-    nose.textureNum = -2;
+    nose.textureNum = g_normalOn ? -3 : -2;
     nose.color = [0, 0, 0, 1];
     nose.matrix.scale(.1, .1, .1);
     nose.matrix.translate(0.1, 1.9, 1.45);
@@ -692,7 +687,7 @@ function renderScene() {
 
     // Static Sphere visual
     var staticSphere = new Sphere();
-    staticSphere.textureNum = -2;
+    staticSphere.textureNum = g_normalOn ? -3 : -2;
     staticSphere.color = [1, 1, 1, 1];
     staticSphere.matrix.setTranslate(0.0, -1.5, 0.0);
     staticSphere.matrix.scale(0.3, 0.3, 0.3);

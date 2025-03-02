@@ -4,7 +4,9 @@ var VSHADER_SOURCE = `
   precision mediump float;
   attribute vec4 a_Position;
   attribute vec2 a_UV;
+  attribute vec3 a_Normal;
   varying vec2 v_UV;
+  varying vec3 v_Normal;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
   uniform mat4 u_ViewMatrix;
@@ -12,26 +14,29 @@ var VSHADER_SOURCE = `
   void main() {
     gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
-
+    v_Normal = a_Normal;
     }`
 
 // Fragment shader program
 var FSHADER_SOURCE = `
   precision mediump float;
   varying vec2 v_UV;
+  varying vec3 v_Normal;
   uniform vec4 u_FragColor;  // uniform
   uniform sampler2D u_Sampler0;
   uniform int u_whichTexture;
   void main() {
-    
-    if (u_whichTexture == -2) {
+    if (u_whichTexture == -3) {
+    gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); //Use Normal as color
+    }
+    else if (u_whichTexture == -2) {
     gl_FragColor = u_FragColor;
     } else if (u_whichTexture == -1) {
      gl_FragColor = vec4(v_UV, 1.0, 1.0);
     } else if (u_whichTexture == 0) {
       gl_FragColor = texture2D(u_Sampler0, v_UV);
     } else {
-      gl_FragColor = vec4(1, .2, .2, 1);
+      gl_FragColor = vec4(1, 1, 1, 1);
     }
 
   }`
@@ -81,6 +86,12 @@ function connectVariablesToGLSL() {
   a_UV = gl.getAttribLocation(gl.program, 'a_UV');
   if (a_UV < 0) {
     console.log('Failed to get the storage location of a_UV');
+    return;
+  }
+
+  a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+  if (a_Normal < 0) {
+    console.log('Failed to get the storage location of a_Normal');
     return;
   }
 
@@ -156,7 +167,7 @@ let g_globalAngleY = 0;
 let isDragging = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
-
+let g_normalOn = false;
 
 function showStory() {
     document.getElementById('story').style.display = 'block';
@@ -171,6 +182,15 @@ function hideStory() {
 }
 
 function addActionsForHtmlUI() {
+
+    document.getElementById('normalOn') .onclick = function() {
+        g_normalOn = true;
+    };
+
+    document.getElementById('normalOff').onclick = function() {
+        g_normalOn = false; 
+    };
+
     document.getElementById('yellowSlide').addEventListener('mousemove', function() {
         g_YellowAngle = -1 * this.value;
         renderScene();
@@ -481,7 +501,7 @@ function renderScene() {
     // Draw the ground using a cube
     var ground = new Cube();
     ground.color = [0.76, 0.70, 0.50, 1];
-    ground.textureNum = 0;
+    ground.textureNum = -2;
     ground.matrix.setTranslate(-10, -1, -10);
     ground.matrix.scale(50, 0.06, 50);
     ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
@@ -495,11 +515,16 @@ function renderScene() {
 
     // Draw the blue sky box
     var sky = new Cube();
+    if (g_normalOn) {
+        sky.textureNum = -3;
+    }
+    else {
+        sky.textureNum = -2;
+    }
     sky.color = [0.529, 0.808, 0.922, 1];
-    sky.textureNum = -2;
     sky.matrix.setTranslate(-10, -10, -10);
-    sky.matrix.scale(75, 75, 75);
-    sky.matrix.rotate(g_seconds * 12, g_seconds * 12, g_seconds * 12, g_seconds * 12);
+    sky.matrix.scale(25, 25, 25);
+    // sky.matrix.rotate(g_seconds * 12, g_seconds * 12, g_seconds * 12, g_seconds * 12);
     sky.render();
 
     // Draw houses and roofs

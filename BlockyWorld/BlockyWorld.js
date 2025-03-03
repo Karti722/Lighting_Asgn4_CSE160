@@ -451,24 +451,6 @@ function sendImageToTEXTURE0(image){
   var g_up=[0,1,0];
 
 
-  function drawTree(x, y, z) {
-    // Draw the trunk
-    var trunk = new Cube();
-    trunk.color = [0.55, 0.27, 0.07, 1];
-    trunk.textureNum = -2;
-    trunk.matrix.setTranslate(x, y, z);
-    trunk.matrix.scale(0.5, 2, 0.5);
-    trunk.render();
-
-    // Draw the leaves
-    var leaves = new Sphere();
-    leaves.color = [0.0, 0.8, 0.0, 1];
-    leaves.textureNum = -2;
-    leaves.matrix.setTranslate(x, y + 2, z);
-    leaves.matrix.scale(1.5, 1.5, 1.5);
-    leaves.render();
-}
-
 
 function renderScene() {
     // Pass the projection matrix
@@ -489,14 +471,6 @@ function renderScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    drawTree(-7, -1, -3);
-    drawTree(4, -1, -3);
-    drawTree(10, -1, 3);
-    drawTree(-12, -1, 3);
-    drawTree(14, -1, 3);
-    drawTree(16, -1, 3);
-    drawTree(-16, -1, 3);
-    drawTree(20, -1, 3);
 
     // Draw the ground using a cube
     var ground = new Cube();
@@ -507,12 +481,6 @@ function renderScene() {
     ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
     ground.render();
 
-    var ocean = new Cube();
-    ocean.color = [0.0, 0.0, 1.0, 1];
-    ocean.textureNum = g_normalOn ? -3 : 0;
-    ocean.matrix.setTranslate(-10, -1, -10);
-    ocean.matrix.scale(70, 0.06, 70);
-    ocean.render();
 
     // Draw the blue sky box
     var sky = new Cube();
@@ -522,11 +490,9 @@ function renderScene() {
     sky.matrix.scale(25, 25, 25);
     sky.render();
 
-    // Draw houses and roofs
-    drawHouse(-5, -1, -5);
 
     // Draw clouds
-    drawClouds();
+  
 
     // Draw a left arm
     var leftArm = new Cube();
@@ -678,98 +644,17 @@ function renderScene() {
 
     // Bear nose
     var nose = new Sphere();
-    nose.textureNum = g_normalOn ? -3 : -2;
+    nose.textureNum = 0;
+    nose.textureNum = g_normalOn ? -3 : nose.textureNum;
     nose.color = [0, 0, 0, 1];
-    nose.matrix.scale(.1, .1, .1);
     nose.matrix.translate(0.1, 1.9, 1.45);
-    if (g_animation === true) { }
     nose.render();
 
-    // Static Sphere visual
-    var staticSphere = new Sphere();
-    staticSphere.textureNum = g_normalOn ? -3 : -2;
-    staticSphere.color = [1, 1, 1, 1];
-    staticSphere.matrix.setTranslate(0.0, -1.5, 0.0);
-    staticSphere.matrix.scale(0.3, 0.3, 0.3);
+    
 
-    if (shiftPressed === true && clicked === true) {
-        staticSphere.matrix.translate(0, 5, 1)
-        staticSphere.matrix.scale(Math.abs(15 * Math.cos(g_seconds * 6)), Math.abs(25 * Math.cos(g_seconds * 4)), Math.abs(25 * Math.cos(g_seconds * 4)));
-        staticSphere.matrix.rotate(g_seconds * 30, 0, 1, 0);
-        leftEye.matrix.translate(.5 * Math.sin(g_seconds * 2), 0, 0);
-        leftEye.render();
-        rightEye.matrix.translate(-.5 * Math.sin(g_seconds * 2), 0, 0);
-        rightEye.render();
 
-        rightArm.matrix.translate(180 * Math.sin(g_seconds * 4), 1, 1, 1);
-        rightArm.matrix.rotate(Math.cos(g_seconds * 6), 1, 1, 1);
-        rightArm.render();
-
-        leftEar.matrix.rotate(Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
-        leftEar.render();
-
-        rightEar.matrix.rotate(-1 * Math.abs(22 * Math.sin(g_seconds * 4)), 1, 1, 1);
-        rightEar.render();
-
-        body.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
-        body.matrix.scale(1.2 * Math.cos(g_seconds * 4), 1.2 * Math.cos(g_seconds * 4), 0);
-        body.render();
-
-        leftLeg.matrix.rotate(-1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 0, 0);
-        leftLeg.matrix.scale(1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
-        leftLeg.render();
-
-        rightLeg.matrix.rotate(1 * Math.abs(12 * Math.sin(g_seconds * 4)), 1, 1, 1);
-        rightLeg.matrix.scale(-1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
-        rightLeg.render();
-
-        teeth.matrix.scale(.1 * Math.cos(g_seconds * 6), 1, Math.sin(g_seconds * 25));
-        teeth.color = [1, 1, 1, 1];
-        teeth.render();
-
-        mouth.matrix.scale(.05 * Math.cos(g_seconds * 6), 1, 1);
-        mouth.render();
-
-        nose.matrix.scale(1.25 * Math.cos(g_seconds * 6), 1, 1);
-        nose.render();
-    }
 }
 
-function drawHouse(x, y, z) {
-    var house = new Cube();
-    house.color = [0.8, 0.5, 0.2, 1];
-    house.textureNum = -2;
-    house.matrix.setTranslate(x, y, z);
-    house.matrix.scale(2, 2, 2);
-    house.render();
 
-    var roof = new Cube();
-    roof.color = [0.5, 0.2, 0.2, 1];
-    roof.textureNum = -2;
-    roof.matrix.setTranslate(x, y + 2, z);
-    roof.matrix.scale(2.2, 0.5, 2.2);
-    roof.render();
-}
 
-function drawRain() {
-    for (let i = 0; i < 50; i++) { // Reduced number of raindrops
-        var rainDrop = new Sphere();
-        rainDrop.color = [0.0, 0.0, 1.0, 1];
-        rainDrop.matrix.setTranslate(Math.random() * 20 - 10, Math.random() * 10 - (g_seconds % 10), Math.random() * 20 - 10);
-        rainDrop.matrix.scale(0.05, 0.05, 0.05);
-        rainDrop.render();
-    }
-}
 
-function drawClouds() {
-    for (let i = 0; i < 3; i++) { // Reduced number of clouds
-        var cloud = new Sphere();
-        cloud.color = [1.0, 1.0, 1.0, 1];
-        var angle = g_seconds * 20 + i * 120; // 120 degrees apart for 3 clouds
-        var x = 10 * Math.cos(angle * Math.PI / 180);
-        var z = 10 * Math.sin(angle * Math.PI / 180);
-        cloud.matrix.setTranslate(x, 5, z);
-        cloud.matrix.scale(2, 1, 1.5); // Distort the sphere to look like a cloud
-        cloud.render();
-    }
-}

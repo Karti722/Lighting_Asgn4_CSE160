@@ -1,55 +1,52 @@
+
+function cos(r) { return Math.cos(r); }
+function sin(r) { return Math.sin(r); }
 class Sphere {
-    constructor() {
+  constructor() {
+      this.type = 'sphere';
+
       this.color = [1.0, 1.0, 1.0, 1.0];
+
       this.matrix = new Matrix4();
-      this.segments = 16; // Number of latitude/longitude divisions
-    }
-  
-    render() {
+      this.textureNum = -2;
+      this.verts32 = new Float32Array([]);
+  }
+
+  render() {
+      // Pass the model matrix to the shader
       var rgba = this.color;
+      gl.uniform1i(u_whichTexture, this.textureNum);
       gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
       gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
-      
-      let vertices = this.generateSphereVertices(this.segments);
-      
-      let vertexBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-      
-      gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(a_Position);
-      
-      gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 3);
-    }
-  
-    generateSphereVertices(segments) {
-      let vertices = [];
-      for (let lat = 0; lat <= segments; lat++) {
-        let theta1 = (lat * Math.PI) / segments;
-        let theta2 = ((lat + 1) * Math.PI) / segments;
-  
-        for (let lon = 0; lon <= segments; lon++) {
-          let phi1 = (lon * 2 * Math.PI) / segments;
-          let phi2 = ((lon + 1) * 2 * Math.PI) / segments;
-  
-          let p1 = this.sphereVertex(theta1, phi1);
-          let p2 = this.sphereVertex(theta2, phi1);
-          let p3 = this.sphereVertex(theta1, phi2);
-          let p4 = this.sphereVertex(theta2, phi2);
-  
-          vertices.push(...p1, ...p2, ...p3);
-          vertices.push(...p3, ...p2, ...p4);
-        }
+
+      var d = Math.PI/10;
+      var dd= Math.PI/10;
+
+      for (var t=0; t<Math.PI; t+=d){
+          for (var r=0; r<2*Math.PI; r+=dd){
+              var p1 = [sin(t)*cos(r), sin(t)*sin(r), cos(t)];
+
+              var p2 = [sin(t+dd)*cos(r), sin(t+dd)*sin(r), cos(t+dd)];
+              var p3 = [sin(t)*cos(r+dd), sin(t)*sin(r+dd), cos(t)];
+              var p4 = [sin(t+dd)*cos(r+dd), sin(t+dd)*sin(r+dd), cos(t+dd)];
+
+              var v = [];
+              var uv = [];
+              v=v.concat(p1); uv=uv.concat([0,0]);
+              v=v.concat(p2); uv=uv.concat([0,0]);
+              v=v.concat(p4); uv=uv.concat([0,0]);
+
+              gl.uniform4f(u_FragColor, 1,0,0,1);
+              drawTriangle3DUVNormal(v,uv,v);
+
+              v = []; uv=[];
+              v=v.concat(p1); uv=uv.concat([0,0]);
+              v=v.concat(p4); uv=uv.concat([0,0]);
+              v=v.concat(p3); uv=uv.concat([0,0]);
+              gl.uniform4f(u_FragColor, 1,0,0,1);
+              drawTriangle3DUVNormal(v,uv,v);
+          }
+
       }
-      return vertices;
-    }
-  
-    sphereVertex(theta, phi) {
-      return [
-        Math.sin(theta) * Math.cos(phi),
-        Math.cos(theta),
-        Math.sin(theta) * Math.sin(phi)
-      ];
-    }
   }
-  
+}

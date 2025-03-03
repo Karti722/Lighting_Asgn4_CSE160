@@ -25,28 +25,31 @@ var FSHADER_SOURCE = `
   precision mediump float;
   varying vec2 v_UV;
   varying vec3 v_Normal;
-  uniform vec4 u_FragColor;  // uniform
+  varying vec4 v_VertPos;
+  uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
   uniform int u_whichTexture;
   uniform vec3 u_lightPos;
+  uniform vec3 u_lightPos2;
   uniform vec3 u_cameraPos;
-  uniform bool u_lightOn;  // Add this line
-  varying vec4 v_VertPos;
+  uniform bool u_lightOn;
+
   void main() {
+    vec4 baseColor;
+
     if (u_whichTexture == -3) {
-      gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); //Use Normal as color
-    }
-    else if (u_whichTexture == -2) {
-      gl_FragColor = u_FragColor;
+      baseColor = vec4((v_Normal + 1.0) / 2.0, 1.0);
+    } else if (u_whichTexture == -2) {
+      baseColor = u_FragColor;
     } else if (u_whichTexture == -1) {
-      gl_FragColor = vec4(v_UV, 1.0, 1.0);
+      baseColor = vec4(v_UV, 1.0, 1.0);
     } else if (u_whichTexture == 0) {
-      gl_FragColor = texture2D(u_Sampler0, v_UV);
+      baseColor = texture2D(u_Sampler0, v_UV);
     } else {
-      gl_FragColor = vec4(1, 1, 1, 1);
+      baseColor = vec4(1, 1, 1, 1);
     }
 
-    if (u_lightOn) {  // Perform light calculations only if the light is on
+    if (u_lightOn) {
       vec3 lightVector = u_lightPos - vec3(v_VertPos);
       float distance = length(lightVector);
       vec3 L = normalize(lightVector);
@@ -57,16 +60,31 @@ var FSHADER_SOURCE = `
       vec3 E = normalize(u_cameraPos - vec3(v_VertPos));
       float specular = pow(max(dot(E, R), 0.0), 50.0);
 
-      float attenuation = 1.0 / (1.0 + 0.02 * distance + 0.001 * distance * distance);
+      float attenuation = 1.0 / (0.1 + 0.1 * distance + 0.02 * distance * distance);
 
-      vec3 diffuse = vec3(gl_FragColor) * nDotL * 1.5 * attenuation;
-      vec3 ambient = vec3(gl_FragColor) * 0.3;
-      vec3 specularColor = vec3(1.0, 1.0, 1.0) * specular * 1.0 * attenuation;
+      vec3 ambient = vec3(baseColor) * 0.3;
+      vec3 diffuse = vec3(baseColor) * nDotL * attenuation;
+      vec3 specularColor = vec3(1.0, 1.0, 1.0) * specular * attenuation;
 
-      gl_FragColor = vec4(diffuse + ambient + specularColor, 1);
+      // Second light source calculations with increased brightness
+      vec3 lightVector2 = u_lightPos2 - vec3(v_VertPos);
+      float distance2 = length(lightVector2);
+      vec3 L2 = normalize(lightVector2);
+      float nDotL2 = max(dot(N, L2), 0.0);
+
+      vec3 R2 = reflect(-L2, N);
+      float specular2 = pow(max(dot(E, R2), 0.0), 50.0);
+
+      float attenuation2 = 1.0 / (0.1 + 0.1 * distance2 + 0.02 * distance2 * distance2);
+
+      vec3 diffuse2 = vec3(baseColor) * nDotL2 * attenuation2 * 1.0; // Increase brightness by multiplying by 5
+      vec3 specularColor2 = vec3(1.0, 1.0, 1.0) * specular2 * attenuation2 * 5.0; // Increase brightness by multiplying by 5
+
+      gl_FragColor = vec4(ambient + diffuse + specularColor + diffuse2 + specularColor2, baseColor.a);
+    } else {
+      gl_FragColor = baseColor;
     }
-  }`
-
+  }`;
 //   Global Variables
   let g_lightOn = true; // Add this global variable to track the light state
   let u_lightOn;
@@ -86,6 +104,7 @@ var FSHADER_SOURCE = `
   let u_cameraPos;
   let u_lightPos;
   let a_Normal;
+  let u_lightPos2;
 
 function toggleLight() {
     g_lightOn = !g_lightOn;
@@ -154,6 +173,12 @@ function connectVariablesToGLSL() {
   u_lightPos = gl.getUniformLocation(gl.program, 'u_lightPos');
   if (!u_lightPos) {
     console.log('Failed to get the storage location of u_lightPos');
+    return;
+  }
+
+  u_lightPos2 = gl.getUniformLocation(gl.program, 'u_lightPos2');
+  if (!u_lightPos2) {
+    console.log('Failed to get the storage location of u_lightPos2');
     return;
   }
 
@@ -541,42 +566,55 @@ function sendImageToTEXTURE0(image){
   function renderScene() {
     // Pass the projection matrix
     gl.uniformMatrix4fv(u_ProjectionMatrix, false, camera.projectionMatrix.elements);
-
+  
     // Pass the view matrix
     gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
-
+  
     var globalRotMat = new Matrix4()
         .rotate(g_globalAngleY + 180, 0, 1, 0)  // Rotate around Y-axis
         .rotate(g_globalAngleX, 1, 0, 0); // Rotate around X-axis
-
+  
     if (g_globalAngle > 0) {
         globalRotMat.rotate(g_globalAngle, 0, 1, 0);
     }
     gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
-
+  
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clear(gl.COLOR_BUFFER_BIT);
-
+  
     // Update the camera position uniform
     gl.uniform3f(u_cameraPos, camera.eye[0], camera.eye[1], camera.eye[2]);
-
-      // Update the light state uniform
-  gl.uniform1i(u_lightOn, g_lightOn);
-
-  // Draw the light source only if the light is on
-  if (g_lightOn) {
-    gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-    var light = new Cube();
-    light.textureNum = g_normalOn ? -3 : -2;
-    light.color = [2, 2, 0, 1];
-    light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-    light.matrix.scale(-0.1, -0.1, -0.1);
-    light.matrix.translate(-.5, -.5, -.5);
-    light.render();
-  } else {
-    gl.uniform3f(u_lightPos, 0, 0, 0); // Set light position to zero when light is off
-  }
-
+  
+    // Update the light state uniform
+    gl.uniform1i(u_lightOn, g_lightOn);
+  
+    // Draw the light source only if the light is on
+    if (g_lightOn) {
+      gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+      gl.uniform3f(u_lightPos2, 7.5, 7.5, 7.5); // Fixed position near the corner of the sky cube
+  
+      var light = new Cube();
+      light.textureNum = g_normalOn ? -3 : -2;
+      light.color = [2, 2, 0, 1];
+      light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+      light.matrix.scale(-0.1, -0.1, -0.1);
+      light.matrix.translate(-.5, -.5, -.5);
+      light.render();
+  
+      var spotlight = new Cube();
+      spotlight.textureNum = g_normalOn ? -3 : -2;
+      // white colo
+      spotlight.color = [2, 2, 1, 1];
+      spotlight.matrix.translate(7.5, 7.5, 7.5); // Fixed position near the corner of the sky cube
+      spotlight.matrix.scale(-2.5, -2.5, -2.5);
+      spotlight.matrix.translate(.5, .5, .5);
+      spotlight.matrix.rotate(30, 0, 0, 1);
+      spotlight.render();
+    } else {
+      gl.uniform3f(u_lightPos, 0, 0, 0); // Set light position to zero when light is off
+      gl.uniform3f(u_lightPos2, 0, 0, 0);
+    }
+  
     // Draw the ground using a cube
     var ground = new Cube();
     ground.color = [0.76, 0.70, 0.50, 1];
@@ -585,15 +623,15 @@ function sendImageToTEXTURE0(image){
     ground.matrix.scale(50, 0.06, 50);
     ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
     ground.render();
-
+  
     // Draw the blue sky box
     var sky = new Cube();
     sky.textureNum = g_normalOn ? -3 : -2;
     sky.color = [0.529, 0.808, 0.922, 1];
     sky.matrix.setTranslate(-10, -10, -10);
-    sky.matrix.scale(20, 20, 20);
+    sky.matrix.scale(15, 15, 15);
     sky.render();
-
+  
     // Draw a left arm
     var leftArm = new Cube();
     leftArm.textureNum = g_normalOn ? -3 : -2;
@@ -607,7 +645,7 @@ function sendImageToTEXTURE0(image){
     var yellowCoordinatesMat = new Matrix4(leftArm.matrix);
     leftArm.matrix.scale(0.1, 0.5, 0.15);
     leftArm.render();
-
+  
     // right Arm
     var rightArm = new Cube();
     rightArm.textureNum = g_normalOn ? -3 : -2;
@@ -622,7 +660,7 @@ function sendImageToTEXTURE0(image){
         rightArm.matrix.rotate(g_rightArmAngle, 1, 1, 0);
     }
     rightArm.render();
-
+  
     // Draw box --> Left tiny forearm
     var box = new Cube();
     box.textureNum = g_normalOn ? -3 : -2;
@@ -632,7 +670,7 @@ function sendImageToTEXTURE0(image){
     box.matrix.rotate(g_MagentaAngle, 1, 0, 0);
     box.matrix.scale(0.09, 0.1, 0.1);
     box.render();
-
+  
     // leftLeg cube
     var leftLeg = new Cube();
     leftLeg.textureNum = g_normalOn ? -3 : -2;
@@ -643,7 +681,7 @@ function sendImageToTEXTURE0(image){
         leftLeg.matrix.rotate(-45 * Math.sin(g_seconds * 6), 1, 1, 1);
     }
     leftLeg.render();
-
+  
     // rightLeg cube
     var rightLeg = new Cube();
     rightLeg.textureNum = g_normalOn ? -3 : -2;
@@ -652,7 +690,7 @@ function sendImageToTEXTURE0(image){
     rightLeg.matrix.scale(0.1, 0.5, 0.15);
     if (g_animation === true) { }
     rightLeg.render();
-
+  
     // Fox ears
     var leftEar = new Cube();
     leftEar.textureNum = g_normalOn ? -3 : -2;
@@ -662,7 +700,7 @@ function sendImageToTEXTURE0(image){
     leftEar.matrix.scale(0.2, 0.2, 0.2);
     if (g_animation === true) { }
     leftEar.render();
-
+  
     // Left inner ear (red part)
     var leftInnerEar = new Cube();
     leftInnerEar.textureNum = g_normalOn ? -3 : -2;
@@ -672,7 +710,7 @@ function sendImageToTEXTURE0(image){
     leftInnerEar.matrix.scale(0.1, 0.1, 0.1);
     if (g_animation === true) { }
     leftInnerEar.render();
-
+  
     // right ear
     var rightEar = new Cube();
     rightEar.textureNum = g_normalOn ? -3 : -2;
@@ -682,7 +720,7 @@ function sendImageToTEXTURE0(image){
     rightEar.matrix.scale(0.2, 0.2, 0.2);
     if (g_animation === true) { }
     rightEar.render();
-
+  
     // right inner ear (red part)
     var rightInnerEar = new Cube();
     rightInnerEar.textureNum = g_normalOn ? -3 : -2;
@@ -692,7 +730,7 @@ function sendImageToTEXTURE0(image){
     rightInnerEar.matrix.scale(0.1, 0.1, 0.1);
     if (g_animation === true) { }
     rightInnerEar.render();
-
+  
     // body or torso
     var body = new Cube();
     body.textureNum = g_normalOn ? -3 : -2;
@@ -701,7 +739,7 @@ function sendImageToTEXTURE0(image){
     body.matrix.scale(0.5, 1, 0.3);
     if (g_animation === true) { }
     body.render();
-
+  
     // left eye
     var leftEye = new Cube();
     leftEye.textureNum = g_normalOn ? -3 : -2;
@@ -711,7 +749,7 @@ function sendImageToTEXTURE0(image){
     leftEye.matrix.scale(.1, .1, .1);
     if (g_animation === true) { }
     leftEye.render();
-
+  
     // right eye
     var rightEye = new Cube();
     rightEye.textureNum = g_normalOn ? -3 : -2;
@@ -721,7 +759,7 @@ function sendImageToTEXTURE0(image){
     rightEye.matrix.scale(.1, .1, .1);
     if (g_animation === true) { }
     rightEye.render();
-
+  
     // mouth
     var mouth = new Cube();
     mouth.textureNum = g_normalOn ? -3 : -2;
@@ -731,7 +769,7 @@ function sendImageToTEXTURE0(image){
     mouth.matrix.translate(0.65, 2.5, 0.3);
     if (g_animation === true) { }
     mouth.render();
-
+  
     // teeth
     var teeth = new Cube();
     teeth.textureNum = g_normalOn ? -3 : -2;
@@ -741,7 +779,7 @@ function sendImageToTEXTURE0(image){
     teeth.matrix.translate(0.65, 6.5, 0.2);
     if (g_animation === true) { }
     teeth.render();
-
+  
     // Bear nose
     var nose = new Sphere();
     nose.textureNum = 0;
@@ -749,7 +787,7 @@ function sendImageToTEXTURE0(image){
     nose.color = [0, 0, 0, 1];
     nose.matrix.translate(0.1, 1.9, 1.45);
     nose.render();
-}
+  }
 
 
 

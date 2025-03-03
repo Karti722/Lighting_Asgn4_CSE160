@@ -7,6 +7,7 @@ var VSHADER_SOURCE = `
   attribute vec3 a_Normal;
   varying vec2 v_UV;
   varying vec3 v_Normal;
+  varying vec4 v_VertPos;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
   uniform mat4 u_ViewMatrix;
@@ -15,6 +16,7 @@ var VSHADER_SOURCE = `
     gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
     v_Normal = a_Normal;
+    v_VertPos = u_ModelMatrix * a_Position;
     }`
 
 // Fragment shader program
@@ -25,6 +27,8 @@ var FSHADER_SOURCE = `
   uniform vec4 u_FragColor;  // uniform
   uniform sampler2D u_Sampler0;
   uniform int u_whichTexture;
+  uniform vec3 u_lightPos;
+  varying vec4 v_VertPos;
   void main() {
     if (u_whichTexture == -3) {
     gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); //Use Normal as color
@@ -37,6 +41,14 @@ var FSHADER_SOURCE = `
       gl_FragColor = texture2D(u_Sampler0, v_UV);
     } else {
       gl_FragColor = vec4(1, 1, 1, 1);
+    }
+
+    vec3 lightVector = vec3(v_VertPos) - u_lightPos;
+    float r = length(lightVector);
+    if (r < 1.0) {
+      gl_FragColor = vec4(1,0,0,1);
+    } else if (r < 0.0) {
+      gl_FragColor = vec4(0,1,0,1);
     }
 
   }`
@@ -99,6 +111,12 @@ function connectVariablesToGLSL() {
   u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
   if (!u_FragColor) {
     console.log('Failed to get the storage location of u_FragColor');
+    return;
+  }
+
+  u_lightPos = gl.getUniformLocation(gl.program, 'u_lightPos');
+  if (!u_lightPos) {
+    console.log('Failed to get the storage location of u_lightPos');
     return;
   }
 
@@ -168,6 +186,7 @@ let isDragging = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
 let g_normalOn = false;
+let g_lightPos = [0, 1, -2];
 
 function showStory() {
     document.getElementById('story').style.display = 'block';
@@ -200,6 +219,23 @@ function addActionsForHtmlUI() {
         g_MagentaAngle = this.value;
         renderScene();
     });
+
+    // Added these sliders for the light source
+    document.getElementById('lightSlideX').addEventListener('mousemove', function(ev) { 
+        g_lightPos[0] = this.value/100;
+        renderScene();
+    });
+
+    document.getElementById('lightSlideY').addEventListener('mousemove', function(ev) {
+        g_lightPos[1] = this.value/100;
+        renderScene();
+    });
+
+    document.getElementById('lightSlideZ').addEventListener('mousemove', function(ev) {
+        g_lightPos[2] = this.value/100;
+        renderScene();
+    });
+    // Added these sliders for the light source
 
     document.getElementById('angleSlide').addEventListener('mousemove', function () {
         g_globalAngle = this.value;
@@ -471,6 +507,14 @@ function renderScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    // Draw the light source
+    gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+    var light = new Cube();
+    light.color = [2, 2, 0, 1];
+    light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+    light.matrix.scale(0.1, 0.1, 0.1);
+    light.matrix.translate(-.5, -.5, -.5);
+    light.render();
 
     // Draw the ground using a cube
     var ground = new Cube();
@@ -481,7 +525,6 @@ function renderScene() {
     ground.matrix.rotate(g_seconds * 36, g_seconds * 36, g_seconds * 36, g_seconds * 36);
     ground.render();
 
-
     // Draw the blue sky box
     var sky = new Cube();
     sky.textureNum = g_normalOn ? -3 : -2;
@@ -489,10 +532,6 @@ function renderScene() {
     sky.matrix.setTranslate(-10, -10, -10);
     sky.matrix.scale(25, 25, 25);
     sky.render();
-
-
-    // Draw clouds
-  
 
     // Draw a left arm
     var leftArm = new Cube();

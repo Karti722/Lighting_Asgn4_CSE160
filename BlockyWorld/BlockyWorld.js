@@ -47,7 +47,7 @@ var FSHADER_SOURCE = `
     float r = length(lightVector);
     if (r < 1.0) {
       gl_FragColor = vec4(1,0,0,1);
-    } else if (r < 0.0) {
+    }  else if (r < 0.0) {
       gl_FragColor = vec4(0,1,0,1);
     }
 

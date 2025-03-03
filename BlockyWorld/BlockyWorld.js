@@ -45,12 +45,25 @@ var FSHADER_SOURCE = `
 
     vec3 lightVector = vec3(v_VertPos) - u_lightPos;
     float r = length(lightVector);
-    if (r < 1.0) {
-    // make it yellow
-      gl_FragColor = vec4(1,1,0,1);
-    }  else if (r < 0.0) {
-      gl_FragColor = vec4(0,1,0,1);
-    }
+    // if (r < 1.0) {
+    // // make it yellow
+    //   gl_FragColor = vec4(1,1,0,1);
+    // }  else if (r < 0.0) {
+    //   gl_FragColor = vec4(0,1,0,1);
+    // }
+
+    // Light Falloff visualization vector
+    // gl_FragColor = vec4(vec3(gl_FragColor)/(r*r), 1);
+
+    // N dot L
+    vec3 L = normalize(lightVector);
+    vec3 N = normalize(v_Normal);
+    float nDotL = max(dot(N, L), 0.0);
+
+
+   vec3 diffuse = vec3(gl_FragColor) * nDotL;
+   vec3 ambient = vec3(gl_FragColor) * 0.3;
+   gl_FragColor = vec4(diffuse + ambient, 1);
 
   }`
 
@@ -68,6 +81,7 @@ var FSHADER_SOURCE = `
   let u_Sampler0;
   let u_whichTexture;
   let camera;
+  let u_cameraPos;
 
 function setUpWebGL() {
     // Retrieve <canvas> element
@@ -402,13 +416,11 @@ function tick() {
 
 function updateAnimationAngles() {
     if (g_animation) {
-        g_YellowAngle = 45 * Math.sin(g_seconds * 6) - 35;
-        g_rightArmAngle = 45 * Math.sin(g_seconds * 6) - 35;
-        g_MagentaAngle = 45 * Math.sin(g_seconds * 6) - 35;
+      g_lightPos[1] = 0.5 * Math.cos(g_seconds) + 1;
+      g_lightPos[0] = 2 * Math.sin(g_seconds);
+      g_lightPos[2] = 3 * Math.cos(g_seconds);
     }
-    g_lightPos[1] = 0.5 * Math.cos(g_seconds) + 1;
-    g_lightPos[0] = 2 * Math.sin(g_seconds);
-    g_lightPos[2] = 3 * Math.cos(g_seconds);
+    
 }
 
 var g_shapesList = [];
@@ -521,10 +533,11 @@ function renderScene() {
 
     // Draw the light source
     gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-    var light = new Sphere();
+    var light = new Cube();
+    light.textureNum = g_normalOn ? -3 : -2;
     light.color = [2, 2, 0, 1];
     light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-    light.matrix.scale(0.3, 0.3, 0.3);
+    light.matrix.scale(-0.1, -0.1, -0.1);
     light.matrix.translate(-.5, -.5, -.5);
     light.render();
 
@@ -542,7 +555,7 @@ function renderScene() {
     sky.textureNum = g_normalOn ? -3 : -2;
     sky.color = [0.529, 0.808, 0.922, 1];
     sky.matrix.setTranslate(-10, -10, -10);
-    sky.matrix.scale(25, 25, 25);
+    sky.matrix.scale(20, 20, 20);
     sky.render();
 
     // Draw a left arm

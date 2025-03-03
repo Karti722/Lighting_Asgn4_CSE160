@@ -21,32 +21,32 @@ class Cube {
         
   
         // Pass the color of a point to u_FragColor variable
-        gl.uniform4f(u_FragColor, rgba[0]*0.9, rgba[1]*0.9, rgba[2]*0.9, rgba[3]);
+        // gl.uniform4f(u_FragColor, rgba[0]*0.9, rgba[1]*0.9, rgba[2]*0.9, rgba[3]);
 
         // Top of cube
         drawTriangle3DUVNormal([0,1,0, 0,1,1, 1,1,1], [0,0, 0,1, 1,1], [0,1,0, 0,1,0, 0,1,0]);
         drawTriangle3DUVNormal([0,1,0, 1,1,1, 1,1,0], [0,0, 1,1, 1,0], [0,1,0, 0,1,0, 0,1,0]);
 
 
-        gl.uniform4f(u_FragColor, rgba[0]*0.8, rgba[1]*0.8, rgba[2]*0.8, rgba[3]);
+        // gl.uniform4f(u_FragColor, rgba[0]*0.8, rgba[1]*0.8, rgba[2]*0.8, rgba[3]);
 
         // Back of cube
         drawTriangle3DUVNormal([0,0,1, 1,0,1, 1,1,1], [0,0, 1,0, 1,1], [1,0,0, 1,0,0, 1,0,0]);
         drawTriangle3DUVNormal([0,0,1, 1,1,1, 0,1,1], [0,0, 1,1, 0,1], [1,0,0, 1,0,0, 1,0,0]);
 
-        gl.uniform4f(u_FragColor, rgba[0]*0.7, rgba[1]*0.7, rgba[2]*0.7, rgba[3]);
+        // gl.uniform4f(u_FragColor, rgba[0]*0.7, rgba[1]*0.7, rgba[2]*0.7, rgba[3]);
 
         // Bottom of cube
         drawTriangle3DUVNormal([0, 0, 0, 1, 0, 0, 1, 0, 1], [0,0, 1,0, 1,1], [-1,0,0, -1,0,0,-1,0,0]);
         drawTriangle3DUVNormal([0, 0, 0, 1, 0, 1, 0, 0, 1], [0,0, 1,1, 0,1], [-1,0,0, -1,0,0, -1,0,0]);
 
-        gl.uniform4f(u_FragColor, rgba[0]*0.6, rgba[1]*0.6, rgba[2]*0.6, rgba[3]);
+        // gl.uniform4f(u_FragColor, rgba[0]*0.6, rgba[1]*0.6, rgba[2]*0.6, rgba[3]);
 
         // left of cube
         drawTriangle3DUVNormal([0.0, 0.0, 0.0,   0.0, 1.0, 1.0,   0.0, 1.0, 0.0], [0,0, 0,1, 0,0], [0,-1,0, 0,-1,0, 0,-1,0]);
         drawTriangle3DUVNormal([0.0, 0.0, 0.0,   0.0, 0.0, 1.0,   0.0, 1.0, 1.0], [0,0, 0,0, 0,1], [0,-1,0, 0,-1,0, 0,-1,0]);
 
-        gl.uniform4f(u_FragColor, rgba[0]*0.5, rgba[1]*0.9, rgba[2]*0.5, rgba[3]);
+        // gl.uniform4f(u_FragColor, rgba[0]*0.5, rgba[1]*0.9, rgba[2]*0.5, rgba[3]);
 
         // right of cube
         drawTriangle3DUVNormal([ 1.0, 0.0, 0.0,   1.0, 1.0, 0.0,   1.0, 1.0, 1.0], [0,0, 0,1, 1,1], [0,0,1, 0,0,1, 0,0,1]);

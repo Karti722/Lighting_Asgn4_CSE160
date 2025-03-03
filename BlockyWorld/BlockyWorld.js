@@ -46,7 +46,8 @@ var FSHADER_SOURCE = `
     vec3 lightVector = vec3(v_VertPos) - u_lightPos;
     float r = length(lightVector);
     if (r < 1.0) {
-      gl_FragColor = vec4(1,0,0,1);
+    // make it yellow
+      gl_FragColor = vec4(1,1,0,1);
     }  else if (r < 0.0) {
       gl_FragColor = vec4(0,1,0,1);
     }
@@ -384,6 +385,8 @@ function tick() {
   g_fps = 1000 / deltaTime; // Calculate FPS
   g_seconds = now / 1000.0 - g_startTime;
 
+  updateAnimationAngles();
+
   // Update FPS display only once per second
   if (now - g_lastFpsUpdateTime >= 1000) {
     document.getElementById("FPS").innerText = g_fps.toFixed(2);
@@ -397,7 +400,16 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
-
+function updateAnimationAngles() {
+    if (g_animation) {
+        g_YellowAngle = 45 * Math.sin(g_seconds * 6) - 35;
+        g_rightArmAngle = 45 * Math.sin(g_seconds * 6) - 35;
+        g_MagentaAngle = 45 * Math.sin(g_seconds * 6) - 35;
+    }
+    g_lightPos[1] = 0.5 * Math.cos(g_seconds) + 1;
+    g_lightPos[0] = 2 * Math.sin(g_seconds);
+    g_lightPos[2] = 3 * Math.cos(g_seconds);
+}
 
 var g_shapesList = [];
 
@@ -509,10 +521,10 @@ function renderScene() {
 
     // Draw the light source
     gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-    var light = new Cube();
+    var light = new Sphere();
     light.color = [2, 2, 0, 1];
     light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-    light.matrix.scale(0.1, 0.1, 0.1);
+    light.matrix.scale(0.3, 0.3, 0.3);
     light.matrix.translate(-.5, -.5, -.5);
     light.render();
 
